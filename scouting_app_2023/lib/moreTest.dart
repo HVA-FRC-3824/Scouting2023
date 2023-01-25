@@ -59,10 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(title: Text(screenWidth.toString())),
+      appBar: AppBar(title: const Text('LayoutBuilder Example')),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           if (constraints.maxWidth > 600) {
@@ -82,44 +80,26 @@ class _MyHomePageState extends State<MyHomePage> {
         width: 100.0,
         color: Colors.red,
       ),
-      body: new Container(
-        color: Colors.grey[200],
-        child: new Image.asset('assets/images/field_temp_diagram.png'),
-        alignment: Alignment.center,
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        //   child: Column(
-        //     // Column is also a layout widget. It takes a list of children and
-        //     // arranges them vertically. By default, it sizes itself to fit its
-        //     // children horizontally, and tries to be as tall as its parent.
-        //     //
-        //     // Invoke "debug painting" (press "p" in the console, choose the
-        //     // "Toggle Debug Paint" action from the Flutter Inspector in Android
-        //     // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-        //     // to see the wireframe for each widget.
-        //     //
-        //     // Column has various properties to control how it sizes itself and
-        //     // how it positions its children. Here we use mainAxisAlignment to
-        //     // center the children vertically; the main axis here is the vertical
-        //     // axis because Columns are vertical (the cross axis would be
-        //     // horizontal).
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: <Widget>[
-        //       const Text(
-        //         'You have clicked the button this many times:',
-        //       ),
-        //       Text(
-        //         '$_counter',
-        //         style: Theme.of(context).textTheme.headline4,
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: _incrementCounter,
-        //   tooltip: 'Increment',
-        //   child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget _buildWideContainers() {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Container(
+            height: 100.0,
+            width: 100.0,
+            color: Colors.red,
+          ),
+          Container(
+            height: 100.0,
+            width: 100.0,
+            color: Colors.yellow,
+          ),
+        ],
+      ),
     );
   }
 }
