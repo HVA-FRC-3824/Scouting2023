@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_app_2023/variables.dart' as variables;
+import 'package:scouting_app_2023/variables.dart' as globals;
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -59,49 +61,40 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    // This method is rerun every time setState is called, for instance as done
+    // by the _incrementCounter method above.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(title: Text(screenWidth.toString())),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          if (constraints.maxWidth > 600) {
-            return _buildWideContainers();
-          } else {
-            return _buildNormalContainer();
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildNormalContainer() {
-    return Center(
-      child: Container(
-        height: 100.0,
-        width: 100.0,
-        color: Colors.red,
-      ),
-    );
-  }
-
-  Widget _buildWideContainers() {
-    return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Container(
-            height: 100.0,
-            width: 100.0,
-            color: Colors.red,
-          ),
-          Container(
-            height: 100.0,
-            width: 100.0,
-            color: Colors.yellow,
-          ),
-        ],
-      ),
+      body: new Container(
+        color: Colors.grey[200],
+        alignment: Alignment.center,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              child: new Image.asset('assets/images/Scouting_Map.png'),
+            ),
+            new Container(
+              color: Colors.black,
+              padding: EdgeInsets.fromLTRB(750, 1, 1, 1),
+              child: TextButton(
+                onPressed: () => print('Next'),
+                child: Text(
+                  'Next',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10.0,
+                    fontFamily: 'Segoe UI',
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
