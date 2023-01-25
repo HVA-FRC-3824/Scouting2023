@@ -78,9 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildNormalContainer() {
     return Center(
       child: Container(
-        height: 100.0,
-        width: 100.0,
-        color: Colors.red,
+        child: Text("Please Turn device Horizontal"),
       ),
     );
   }
