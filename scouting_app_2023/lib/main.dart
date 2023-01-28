@@ -47,7 +47,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void _incrementCounter() {
+  void buttonPressed() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -76,13 +76,173 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildWideContainers() {
-    return Center();
+    return Center(
+        child: GridView.count(
+      primary: false,
+      padding: const EdgeInsets.all(20),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: (MediaQuery.of(context).size.height / 40),
+      crossAxisCount: 9,
+      children: <Widget>[
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.buttonOneImage)),
+          ),
+          onPressed: () {
+            if (variables.buttonOneState == false) {
+              variables.buttonOneImage =
+                  AssetImage('assets/images/thumbnail_Rodcone.png');
+              variables.buttonOneState = true;
+            } else {
+              variables.buttonOneImage =
+                  AssetImage('assets/images/thumbnail_Rod.png');
+              variables.buttonOneState = false;
+            }
+            buttonPressed();
+          },
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[200],
+          child: const Text('Heed not the rabble'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[300],
+          child: const Text('Sound of screams but the'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[400],
+          child: const Text('Who scream'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[500],
+          child: const Text('Revolution is coming...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[100],
+          child: const Text("He'd have you all unravel at the"),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[200],
+          child: const Text('Heed not the rabble'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[300],
+          child: const Text('Sound of screams but the'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[400],
+          child: const Text('Who scream'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[500],
+          child: const Text('Revolution is coming...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[100],
+          child: const Text("He'd have you all unravel at the"),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[200],
+          child: const Text('Heed not the rabble'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[300],
+          child: const Text('Sound of screams but the'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[400],
+          child: const Text('Who scream'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[500],
+          child: const Text('Revolution is coming...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[100],
+          child: const Text("He'd have you all unravel at the"),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[200],
+          child: const Text('Heed not the rabble'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[300],
+          child: const Text('Sound of screams but the'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[400],
+          child: const Text('Who scream'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[500],
+          child: const Text('Revolution is coming...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+      ],
+    ));
   }
 
   Widget _buildNormalContainer() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    int screenSize = screenWidth.round();
     return Center(
       child: Container(
-        child: Text("Please Turn device Horizontal"),
+        decoration: BoxDecoration(color: Colors.red),
+        child: Text("Please Turn Horizontal"),
       ),
 
       // Center is a layout widget. It takes a single child and positions it
