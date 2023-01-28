@@ -59,12 +59,8 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/Field_Map.png
-    - assets/images/Scouting_Map.png
-  # To add assets to your application, add an assets section, like this:
-    - assets/images/field_temp_diagram.png
-    - assets/images/thumbnail_Rod.png
-    - assets/images/thumbnail_Rodcone.png
+    - assets/images/
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
