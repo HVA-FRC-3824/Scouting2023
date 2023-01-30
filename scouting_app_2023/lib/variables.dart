@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
 
-var buttonOneImage = AssetImage('assets/images/thumbnail_Rod.png');
+var rodAlone = const AssetImage('assets/images/thumbnail_Rod.png');
+var rodCone = const AssetImage('assets/images/thumbnail_Rod.png');
+
+var buttonOneImage = rodAlone;
 var buttonOneState = false;

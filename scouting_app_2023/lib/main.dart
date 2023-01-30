@@ -90,12 +90,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 image: DecorationImage(image: variables.buttonOneImage)),
           ),
           onPressed: () {
+            buttonImageCones();
             if (variables.buttonOneState == false) {
               variables.buttonOneState = true;
             } else {
               variables.buttonOneState = false;
             }
-            buttonImageCones();
             buttonPressed();
           },
         ),
