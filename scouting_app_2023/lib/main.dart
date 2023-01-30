@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_app_2023/variables.dart' as variables;
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -85,14 +86,16 @@ class _MyHomePageState extends State<MyHomePage> {
       children: <Widget>[
         TextButton(
           child: Container(
-              decoration: BoxDecoration(
-                  image: buttonImageCones(variables.buttonOneState))),
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.buttonOneImage)),
+          ),
           onPressed: () {
             if (variables.buttonOneState == false) {
               variables.buttonOneState = true;
             } else {
               variables.buttonOneState = false;
             }
+            buttonImageCones();
             buttonPressed();
           },
         ),
@@ -276,10 +279,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-dynamic buttonImageCones(state) {
-  if (state == false) {
-    return FileImage(File(/assets/image/thumbnail_Rod.png));
+dynamic buttonImageCones() {
+  if (variables.buttonOneState == false) {
+    variables.buttonOneImage =
+        AssetImage('assets/images/thumbnail_Rodcone.png');
   } else {
-    return AssetImage('assets/image/thumbnail_Rodcone.png');
+    variables.buttonOneImage = AssetImage('assets/images/thumbnail_Rod.png');
   }
 }

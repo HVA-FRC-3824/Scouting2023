@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_app_2023/variables.dart' as globals;
+import 'package:scouting_app_2023/variables.dart' as variables;
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -49,7 +47,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void _incrementCounter() {
+  void buttonPressed() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -61,40 +59,226 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: new Container(
-        color: Colors.grey[200],
-        alignment: Alignment.center,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              child: new Image.asset('assets/images/Scouting_Map.png'),
-            ),
-            new Container(
-              color: Colors.black,
-              padding: EdgeInsets.fromLTRB(750, 1, 1, 1),
-              child: TextButton(
-                onPressed: () => print('Next'),
-                child: Text(
-                  'Next',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10.0,
-                    fontFamily: 'Segoe UI',
-                  ),
-                ),
-              ),
-            ),
-          ],
+      appBar: AppBar(title: Text(screenWidth.toString())),
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          if (constraints.maxWidth > 600) {
+            return _buildWideContainers();
+          } else {
+            return _buildNormalContainer();
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildWideContainers() {
+    return Center(
+        child: GridView.count(
+      primary: false,
+      padding: const EdgeInsets.all(20),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: (MediaQuery.of(context).size.height / 40),
+      crossAxisCount: 9,
+      children: <Widget>[
+        TextButton(
+          child: Text('hello'),
+          onPressed: () {
+            if (variables.buttonOneState == false) {
+              variables.buttonOneState = true;
+            } else {
+              variables.buttonOneState = false;
+            }
+            buttonPressed();
+          },
         ),
-        margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[200],
+          child: const Text('Heed not the rabble'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[300],
+          child: const Text('Sound of screams but the'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[400],
+          child: const Text('Who scream'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[500],
+          child: const Text('Revolution is coming...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[100],
+          child: const Text("He'd have you all unravel at the"),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[200],
+          child: const Text('Heed not the rabble'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[300],
+          child: const Text('Sound of screams but the'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[400],
+          child: const Text('Who scream'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[500],
+          child: const Text('Revolution is coming...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[100],
+          child: const Text("He'd have you all unravel at the"),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[200],
+          child: const Text('Heed not the rabble'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[300],
+          child: const Text('Sound of screams but the'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[400],
+          child: const Text('Who scream'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[500],
+          child: const Text('Revolution is coming...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[100],
+          child: const Text("He'd have you all unravel at the"),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[200],
+          child: const Text('Heed not the rabble'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[300],
+          child: const Text('Sound of screams but the'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[400],
+          child: const Text('Who scream'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[500],
+          child: const Text('Revolution is coming...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.teal[600],
+          child: const Text('Revolution, they...'),
+        ),
+      ],
+    ));
+  }
+
+  Widget _buildNormalContainer() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    int screenSize = screenWidth.round();
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(color: Colors.red),
+        child: Text("Please Turn Horizontal"),
+      ),
+
+      // Center is a layout widget. It takes a single child and positions it
+      // in the middle of the parent.
+      //   child: Column(
+      //     // Column is also a layout widget. It takes a list of children and
+      //     // arranges them vertically. By default, it sizes itself to fit its
+      //     // children horizontally, and tries to be as tall as its parent.
+      //     //
+      //     // Invoke "debug painting" (press "p" in the console, choose the
+      //     // "Toggle Debug Paint" action from the Flutter Inspector in Android
+      //     // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+      //     // to see the wireframe for each widget.
+      //     //
+      //     // Column has various properties to control how it sizes itself and
+      //     // how it positions its children. Here we use mainAxisAlignment to
+      //     // center the children vertically; the main axis here is the vertical
+      //     // axis because Columns are vertical (the cross axis would be
+      //     // horizontal).
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     children: <Widget>[
+      //       const Text(
+      //         'You have clicked the button this many times:',
+      //       ),
+      //       Text(
+      //         '$_counter',
+      //         style: Theme.of(context).textTheme.headline4,
+      //       ),
+      //     ],
+      //   ),
+      // ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _incrementCounter,
+      //   tooltip: 'Increment',
+      //   child: const Icon(Icons.add), // Ths trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
+
+// dynamic buttonImageCones(state) {
+//   if (state == false) {
+//     return FileImage(File(/assets/image/thumbnail_Rod.png));
+//   } else {
+//     return AssetImage('assets/image/thumbnail_Rodcone.png');
+//   }
+// }
