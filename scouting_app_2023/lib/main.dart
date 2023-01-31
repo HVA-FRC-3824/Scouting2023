@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.purple,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -59,10 +59,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(title: Text(screenWidth.toString())),
+      appBar: AppBar(
+        leading: TextButton(
+            onPressed: () {},
+            child: const Text(
+              'Restart',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            )),
+        title: const Text('Grid Scout'),
+        actions: [
+          TextButton(
+            child: const Text('Next Page',
+                style: TextStyle(
+                  color: Colors.white,
+                )),
+            onPressed: () {},
+          )
+        ],
+      ),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           if (constraints.maxWidth > 600) {
@@ -390,50 +407,158 @@ class _MyHomePageState extends State<MyHomePage> {
             buttonPressed();
           },
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[100],
-          child: const Text("He'd have you all unravel at the"),
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.button19Image)),
+          ),
+          onPressed: () {
+            button19Image();
+            if (variables.button19State == false) {
+              buttonIndexChanger(19, true);
+              variables.button19State = true;
+            } else {
+              buttonIndexChanger(19, false);
+              variables.button19State = false;
+            }
+            buttonPressed();
+          },
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[200],
-          child: const Text('Heed not the rabble'),
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.button20Image)),
+          ),
+          onPressed: () {
+            button20Image();
+            if (variables.button20State == false) {
+              buttonIndexChanger(20, true);
+              variables.button20State = true;
+            } else {
+              buttonIndexChanger(20, false);
+              variables.button20State = false;
+            }
+            buttonPressed();
+          },
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[300],
-          child: const Text('Sound of screams but the'),
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.button21Image)),
+          ),
+          onPressed: () {
+            button21Image();
+            if (variables.button21State == false) {
+              buttonIndexChanger(21, true);
+              variables.button21State = true;
+            } else {
+              buttonIndexChanger(21, false);
+              variables.button21State = false;
+            }
+            buttonPressed();
+          },
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[400],
-          child: const Text('Who scream'),
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.button22Image)),
+          ),
+          onPressed: () {
+            button22Image();
+            if (variables.button22State == false) {
+              buttonIndexChanger(22, true);
+              variables.button22State = true;
+            } else {
+              buttonIndexChanger(22, false);
+              variables.button22State = false;
+            }
+            buttonPressed();
+          },
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[500],
-          child: const Text('Revolution is coming...'),
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.button23Image)),
+          ),
+          onPressed: () {
+            button23Image();
+            if (variables.button23State == false) {
+              buttonIndexChanger(23, true);
+              variables.button23State = true;
+            } else {
+              buttonIndexChanger(23, false);
+              variables.button23State = false;
+            }
+            buttonPressed();
+          },
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[600],
-          child: const Text('Revolution, they...'),
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.button24Image)),
+          ),
+          onPressed: () {
+            button24Image();
+            if (variables.button24State == false) {
+              buttonIndexChanger(24, true);
+              variables.button24State = true;
+            } else {
+              buttonIndexChanger(24, false);
+              variables.button24State = false;
+            }
+            buttonPressed();
+          },
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[600],
-          child: const Text('Revolution, they...'),
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.button25Image)),
+          ),
+          onPressed: () {
+            button25Image();
+            if (variables.button25State == false) {
+              buttonIndexChanger(25, true);
+              variables.button25State = true;
+            } else {
+              buttonIndexChanger(25, false);
+              variables.button25State = false;
+            }
+            buttonPressed();
+          },
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[600],
-          child: const Text('Revolution, they...'),
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.button26Image)),
+          ),
+          onPressed: () {
+            button26Image();
+            if (variables.button26State == false) {
+              buttonIndexChanger(26, true);
+              variables.button26State = true;
+            } else {
+              buttonIndexChanger(26, false);
+              variables.button26State = false;
+            }
+            buttonPressed();
+          },
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[600],
-          child: const Text('Revolution, they...'),
+        TextButton(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(image: variables.button27Image)),
+          ),
+          onPressed: () {
+            button27Image();
+            if (variables.button27State == false) {
+              buttonIndexChanger(27, true);
+              variables.button27State = true;
+            } else {
+              buttonIndexChanger(27, false);
+              variables.button27State = false;
+            }
+            buttonPressed();
+          },
         ),
       ],
     ));
@@ -661,6 +786,96 @@ dynamic button18Image() {
   } else {
     variables.button18Image =
         const AssetImage('assets/images/thumbnail_rod.png');
+  }
+}
+
+dynamic button19Image() {
+  if (variables.button19State == false) {
+    variables.button19Image =
+        const AssetImage('assets/images/thumbnail_floor.png');
+  } else {
+    variables.button19Image =
+        const AssetImage('assets/images/thumbnail_empty.png');
+  }
+}
+
+dynamic button20Image() {
+  if (variables.button20State == false) {
+    variables.button20Image =
+        const AssetImage('assets/images/thumbnail_floor.png');
+  } else {
+    variables.button20Image =
+        const AssetImage('assets/images/thumbnail_empty.png');
+  }
+}
+
+dynamic button21Image() {
+  if (variables.button21State == false) {
+    variables.button21Image =
+        const AssetImage('assets/images/thumbnail_floor.png');
+  } else {
+    variables.button21Image =
+        const AssetImage('assets/images/thumbnail_empty.png');
+  }
+}
+
+dynamic button22Image() {
+  if (variables.button22State == false) {
+    variables.button22Image =
+        const AssetImage('assets/images/thumbnail_floor.png');
+  } else {
+    variables.button22Image =
+        const AssetImage('assets/images/thumbnail_empty.png');
+  }
+}
+
+dynamic button23Image() {
+  if (variables.button23State == false) {
+    variables.button23Image =
+        const AssetImage('assets/images/thumbnail_floor.png');
+  } else {
+    variables.button23Image =
+        const AssetImage('assets/images/thumbnail_empty.png');
+  }
+}
+
+dynamic button24Image() {
+  if (variables.button24State == false) {
+    variables.button24Image =
+        const AssetImage('assets/images/thumbnail_floor.png');
+  } else {
+    variables.button24Image =
+        const AssetImage('assets/images/thumbnail_empty.png');
+  }
+}
+
+dynamic button25Image() {
+  if (variables.button25State == false) {
+    variables.button25Image =
+        const AssetImage('assets/images/thumbnail_floor.png');
+  } else {
+    variables.button25Image =
+        const AssetImage('assets/images/thumbnail_empty.png');
+  }
+}
+
+dynamic button26Image() {
+  if (variables.button26State == false) {
+    variables.button26Image =
+        const AssetImage('assets/images/thumbnail_floor.png');
+  } else {
+    variables.button26Image =
+        const AssetImage('assets/images/thumbnail_empty.png');
+  }
+}
+
+dynamic button27Image() {
+  if (variables.button27State == false) {
+    variables.button27Image =
+        const AssetImage('assets/images/thumbnail_floor.png');
+  } else {
+    variables.button27Image =
+        const AssetImage('assets/images/thumbnail_empty.png');
   }
 }
 

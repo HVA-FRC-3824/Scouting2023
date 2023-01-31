@@ -4,6 +4,8 @@ var rodAlone = const AssetImage('assets/images/thumbnail_rod.png');
 var rodCone = const AssetImage('assets/images/thumbnail_rodcone.png');
 var platBlock = const AssetImage('assets/images/thumbnail_platblock.png');
 var platAlone = const AssetImage('assets/images/thumbnail_plat.png');
+var floorAlone = const AssetImage('assets/images/thumbnail_empty.png');
+var floorCargo = const AssetImage('assets/images/thumbnail_floor.png');
 
 var buttonOneImage = rodAlone;
 var buttonOneState = false;
@@ -59,23 +61,32 @@ var button17State = false;
 var button18Image = rodAlone;
 var button18State = false;
 
-var button19Image = platAlone;
+var button19Image = floorAlone;
 var button19State = false;
 
-var button20Image = platAlone;
+var button20Image = floorAlone;
 var button20State = false;
 
-var button21Image = platAlone;
+var button21Image = floorAlone;
 var button21State = false;
 
-var button22Image = platAlone;
+var button22Image = floorAlone;
 var button22State = false;
 
-var button23Image = platAlone;
+var button23Image = floorAlone;
 var button23State = false;
 
-var button24Image = platAlone;
+var button24Image = floorAlone;
 var button24State = false;
+
+var button25Image = floorAlone;
+var button25State = false;
+
+var button26Image = floorAlone;
+var button26State = false;
+
+var button27Image = floorAlone;
+var button27State = false;
 
 var pageData = {
   1: false,
@@ -106,3 +117,5 @@ var pageData = {
   26: false,
   27: false,
 };
+
+var testVar = false;
