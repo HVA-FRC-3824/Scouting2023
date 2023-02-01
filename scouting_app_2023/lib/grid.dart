@@ -1,46 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_app_2023/variables.dart' as variables;
 import 'package:scouting_app_2023/home.dart' as home;
-
-void main() {
-  runApp(MaterialApp(
-      title: 'FRC3824 Scouting App',
-      initialRoute: '/grid',
-      routes: {
-        '/': (context) => const MyApp(),
-        '/second': (context) => const HomePage(),
-      }));
-}
-
-var mainContext;
-
-class Primary extends StatelessWidget {
-  const Primary({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'FRC3824 Scouting App',
-        initialRoute: '/grid',
-        routes: {
-          '/': (context) => const MyApp(),
-          '/second': (context) => const HomePage(),
-        });
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
-    );
-  }
-}
+import 'package:scouting_app_2023/main.dart' as dartmain;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -102,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         leading: TextButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/second');
+              Navigator.pushNamed(context, '/home');
             },
             child: const Text(
               'Back',
