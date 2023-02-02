@@ -1,91 +1,174 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_app_2023/variables.dart' as variables;
-import 'package:scouting_app_2023/home.dart' as home;
 
 void main() {
-  runApp(MaterialApp(
-      title: 'FRC3824 Scouting App',
-      initialRoute: '/grid',
+  runApp(
+    MaterialApp(
+      title: 'Named Routes Demo',
+      // Start the app with the "/" named route. In this case, the app starts
+      // on the FirstScreen widget.
+      initialRoute: '/',
       routes: {
-        '/': (context) => const MyApp(),
-        '/second': (context) => const HomePage(),
-      }));
+        // When navigating to the "/" route, build the FirstScreen widget.
+        '/': (context) => const FirstScreen(),
+        // When navigating to the "/second" route, build the SecondScreen widget.
+        '/second': (context) => const SecondScreen(),
+      },
+    ),
+  );
 }
 
-var mainContext;
-
-class Primary extends StatelessWidget {
-  const Primary({super.key});
-
+class FirstScreen extends StatelessWidget {
+  const FirstScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'FRC3824 Scouting App',
-        initialRoute: '/grid',
-        routes: {
-          '/': (context) => const MyApp(),
-          '/second': (context) => const HomePage(),
-        });
+    var textSize = ((MediaQuery.of(context).size.height / 2) *
+            (MediaQuery.of(context).size.width) /
+            3) /
+        60;
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.purple,
+        leading: Container(),
+        title: const Text('First Screen'),
+      ),
+      body: Container(
+        color: Colors.black,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            color: Colors.red,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: (MediaQuery.of(context).size.height / 6),
+                  color: Colors.blue,
+                  child: ElevatedButton(
+                    // Within the `FirstScreen` widget
+                    onPressed: () {
+                      // Navigate to the second screen using a named route.
+                      Navigator.pushNamed(context, '/second');
+                    },
+                    child: const Text('Launch screen'),
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: (MediaQuery.of(context).size.height / 6),
+                  color: Colors.black,
+                  child: TextButton(
+                    // Within the `FirstScreen` widget
+                    onPressed: () {},
+                    child: Text(
+                      'Schedule Page',
+                      style: TextStyle(
+                        fontSize: (textSize / 40),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class SecondScreen extends StatelessWidget {
+  const SecondScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        leading: TextButton(
+          child: const Text(
+            'Back',
+            style: TextStyle(color: Colors.red),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/');
+          },
+        ),
+        title: const Text('Second Screen'),
+        actions: [
+          TextButton(
+            child: const Text('Next'),
+            // Within the `FirstScreen` widget
+            onPressed: () {
+              // Navigate to the second screen using a named route.
+              Navigator.pushNamed(context, '/');
+            },
+          )
+        ],
       ),
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          if (constraints.maxWidth > 600) {
+            return const WideContainer();
+          } else {
+            return _buildNormalContainer();
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildNormalContainer() {
+    return Center(
+      child: Container(
+        decoration: const BoxDecoration(color: Colors.red),
+        child: const Text("Please Turn Horizontal"),
+      ),
+
+      // Center is a layout widget. It takes a single child and positions it
+      // in the middle of the parent.
+      //   child: Column(
+      //     // Column is also a layout widget. It takes a list of children and
+      //     // arranges them vertically. By default, it sizes itself to fit its
+      //     // children horizontally, and tries to be as tall as its parent.
+      //     //
+      //     // Invoke "debug painting" (press "p" in the console, choose the
+      //     // "Toggle Debug Paint" action from the Flutter Inspector in Android
+      //     // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+      //     // to see the wireframe for each widget.
+      //     //
+      //     // Column has various properties to control how it sizes itself and
+      //     // how it positions its children. Here we use mainAxisAlignment to
+      //     // center the children vertically; the main axis here is the vertical
+      //     // axis because Columns are vertical (the cross axis would be
+      //     // horizontal).
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     children: <Widget>[
+      //       const Text(
+      //         'You have clicked the button this many times:',
+      //       ),
+      //       Text(
+      //         '$_counter',
+      //         style: Theme.of(context).textTheme.headline4,
+      //       ),
+      //     ],
+      //   ),
+      // ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _incrementCounter,
+      //   tooltip: 'Increment',
+      //   child: const Icon(Icons.add), // Ths trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
+class WideContainer extends StatefulWidget {
+  const WideContainer({super.key});
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.purple,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
+  State<WideContainer> createState() => WideContainerState();
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class WideContainerState extends State<WideContainer> {
   void buttonPressed() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -98,42 +181,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/second');
-            },
-            child: const Text(
-              'Back',
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            )),
-        title: const Text('Grid Scout'),
-        actions: [
-          TextButton(
-            child: const Text('Next Page',
-                style: TextStyle(
-                  color: Colors.white,
-                )),
-            onPressed: () {},
-          )
-        ],
-      ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          if (constraints.maxWidth > 600) {
-            return _buildWideContainers();
-          } else {
-            return _buildNormalContainer();
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildWideContainers() {
     return Center(
         child: GridView.count(
       primary: false,
@@ -603,50 +650,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ],
     ));
-  }
-
-  Widget _buildNormalContainer() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    return Center(
-      child: Container(
-        decoration: const BoxDecoration(color: Colors.red),
-        child: const Text("Please Turn Horizontal"),
-      ),
-
-      // Center is a layout widget. It takes a single child and positions it
-      // in the middle of the parent.
-      //   child: Column(
-      //     // Column is also a layout widget. It takes a list of children and
-      //     // arranges them vertically. By default, it sizes itself to fit its
-      //     // children horizontally, and tries to be as tall as its parent.
-      //     //
-      //     // Invoke "debug painting" (press "p" in the console, choose the
-      //     // "Toggle Debug Paint" action from the Flutter Inspector in Android
-      //     // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-      //     // to see the wireframe for each widget.
-      //     //
-      //     // Column has various properties to control how it sizes itself and
-      //     // how it positions its children. Here we use mainAxisAlignment to
-      //     // center the children vertically; the main axis here is the vertical
-      //     // axis because Columns are vertical (the cross axis would be
-      //     // horizontal).
-      //     mainAxisAlignment: MainAxisAlignment.center,
-      //     children: <Widget>[
-      //       const Text(
-      //         'You have clicked the button this many times:',
-      //       ),
-      //       Text(
-      //         '$_counter',
-      //         style: Theme.of(context).textTheme.headline4,
-      //       ),
-      //     ],
-      //   ),
-      // ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.add), // Ths trailing comma makes auto-formatting nicer for build methods.
-    );
   }
 }
 
