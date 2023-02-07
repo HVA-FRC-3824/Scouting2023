@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "246498824596",
+    "firebase_url": "https://firescout3824-default-rtdb.firebaseio.com",
+    "project_id": "firescout3824",
+    "storage_bucket": "firescout3824.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246498824596:android:c986963e31d463689d3f81",
+        "android_client_info": {
+          "package_name": "com.example.scouting_app_2023"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246498824596-4htnpnbqhabqpmnset3rrh9f2160c688.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAH-7YERZcuUO380l57RZ7UqnoRpn2BBpg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "246498824596-4htnpnbqhabqpmnset3rrh9f2160c688.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "246498824596-b3cu10rjs22llm6vk4sb7pi0blega0fe.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.scoutingApp2023"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
