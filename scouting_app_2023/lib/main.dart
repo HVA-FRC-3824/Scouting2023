@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_app_2023/variables.dart' as variables;
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
+bool authState = false;
+void main() async {
+//AUTHENTICATION
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    if (user == null) {
+      print('User is currently signed out!');
+      authState = false;
+    } else {
+      authState = true;
+      print('User is signed in!');
+    }
+  });
   runApp(
     MaterialApp(
       title: 'Named Routes Demo',
@@ -12,96 +29,324 @@ void main() {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => const FirstScreen(),
         // When navigating to the "/second" route, build the SecondScreen widget.
-        '/second': (context) => const SecondScreen(),
+        '/grid': (context) => const SecondScreen(),
+
+        '/create': (context) => const CreateAccount(),
+
+        '/signin': (context) => const GeneralSignin(),
       },
     ),
   );
 }
 
-class FirstScreen extends StatelessWidget {
-  const FirstScreen({super.key});
+class GeneralSignin extends StatelessWidget {
+  const GeneralSignin({super.key});
+
   @override
   Widget build(BuildContext context) {
-    var textSize = ((MediaQuery.of(context).size.height / 2) *
-            (MediaQuery.of(context).size.width) /
-            3) /
-        60;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.purple,
         leading: Container(),
-        title: const Text('First Screen'),
+        title: const Text('login'),
       ),
-      body: Container(
-        color: Colors.black,
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            color: Colors.red,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: (MediaQuery.of(context).size.height / 6),
-                  color: Colors.blue,
-                  child: ElevatedButton(
-                    // Within the `FirstScreen` widget
-                    onPressed: () {
-                      // Navigate to the second screen using a named route.
-                      Navigator.pushNamed(context, '/second');
-                    },
-                    child: const Text('Launch screen'),
-                  ),
+      body: Center(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              child: const TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'USERNAME',
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: (MediaQuery.of(context).size.height / 6),
-                  color: Colors.black,
-                  child: TextButton(
-                    // Within the `FirstScreen` widget
-                    onPressed: () {},
-                    child: Text(
-                      'Schedule Page',
-                      style: TextStyle(
-                        fontSize: (textSize / 40),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              child: const TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'PASSWORD',
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              child: TextButton(
+                style: const ButtonStyle(
+                  backgroundColor:
+                      MaterialStatePropertyAll<Color>(Colors.amber),
+                ),
+                child: Container(
+                  margin:
+                      EdgeInsets.all(MediaQuery.of(context).size.height / 30),
+                  child: const Text('Login'),
+                ),
+                onPressed: () {
+                  authState = true;
+                  Navigator.pushNamed(context, '/');
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              child: TextButton(
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll<Color>(Colors.grey),
+                ),
+                child: Container(
+                  margin:
+                      EdgeInsets.all(MediaQuery.of(context).size.height / 50),
+                  child: const Text('Create Acc?'),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/create');
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class SecondScreen extends StatelessWidget {
-  const SecondScreen({super.key});
+class CreateAccount extends StatelessWidget {
+  const CreateAccount({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
+        title: const Text('Account Creation'),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              child: const TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'USERNAME',
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              child: const TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'PASSWORD',
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              child: TextButton(
+                style: const ButtonStyle(
+                  backgroundColor:
+                      MaterialStatePropertyAll<Color>(Colors.amber),
+                ),
+                child: Container(
+                  margin:
+                      EdgeInsets.all(MediaQuery.of(context).size.height / 30),
+                  child: const Text('Create'),
+                ),
+                onPressed: () {
+                  authState = true;
+                  Navigator.pushNamed(context, '/');
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              child: TextButton(
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll<Color>(Colors.grey),
+                ),
+                child: Container(
+                  margin:
+                      EdgeInsets.all(MediaQuery.of(context).size.height / 50),
+                  child: const Text('Sign In?'),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/signin');
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FirstScreen extends StatelessWidget {
+  const FirstScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: Colors.purple,
+        leading: Container(),
+        title: const Text('Home'),
+      ),
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          if (authState == false) {
+            return loginScreen(context);
+          } else {
+            return buildNormalHome(context);
+          }
+        },
+      ),
+    );
+  }
+
+  Widget loginScreen(context) {
+    var textSize = ((MediaQuery.of(context).size.height / 2) *
+            (MediaQuery.of(context).size.width) /
+            5) /
+        40;
+    return Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+            child: TextButton(
+              child: Text('Login'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/signin');
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+            child: TextButton(
+              child: Text('Create Account?'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/create');
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildNormalHome(context) {
+    var textSize = ((MediaQuery.of(context).size.height / 2) *
+            (MediaQuery.of(context).size.width) /
+            5) /
+        40;
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  colors: <Color>[
+                    Colors.black,
+                    Colors.purple,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: (MediaQuery.of(context).size.height * .2),
+            color: Colors.black,
+            child: TextButton(
+              // Within the `FirstScreen` widget
+              onPressed: () {
+                // Navigate to the second screen using a named route.
+                Navigator.pushNamed(context, '/grid');
+              },
+              child: Text(
+                'Scouting Page',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: (textSize / 40),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: (MediaQuery.of(context).size.height * .2),
+            color: Colors.red,
+            child: TextButton(
+              // Within the `FirstScreen` widget
+              onPressed: () {},
+              child: Text(
+                'Schedule Page',
+                style: TextStyle(
+                  fontSize: (textSize / 40),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SecondScreen extends StatefulWidget {
+  const SecondScreen({super.key});
+
+  @override
+  State<SecondScreen> createState() => SecondScreenState();
+}
+
+class SecondScreenState extends State<SecondScreen> {
+  void buttonPressed() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.purple,
         leading: TextButton(
           child: const Text(
             'Back',
-            style: TextStyle(color: Colors.red),
+            style: TextStyle(color: Colors.white),
           ),
           onPressed: () {
-            Navigator.pushNamed(context, '/');
+            Navigator.pop(context);
           },
         ),
         title: const Text('Second Screen'),
         actions: [
           TextButton(
-            child: const Text('Next'),
+            child: const Text(
+              'Next',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
             // Within the `FirstScreen` widget
             onPressed: () {
-              // Navigate to the second screen using a named route.
-              Navigator.pushNamed(context, '/');
+              //pushToFirebase(); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
+              buttonPressed();
+              resetAllData();
             },
           )
         ],
@@ -109,7 +354,7 @@ class SecondScreen extends StatelessWidget {
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           if (constraints.maxWidth > 600) {
-            return const WideContainer();
+            return wideContainer();
           } else {
             return _buildNormalContainer();
           }
@@ -160,27 +405,8 @@ class SecondScreen extends StatelessWidget {
       //   child: const Icon(Icons.add), // Ths trailing comma makes auto-formatting nicer for build methods.
     );
   }
-}
 
-class WideContainer extends StatefulWidget {
-  const WideContainer({super.key});
-  @override
-  State<WideContainer> createState() => WideContainerState();
-}
-
-class WideContainerState extends State<WideContainer> {
-  void buttonPressed() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget wideContainer() {
     return Center(
         child: GridView.count(
       primary: false,
@@ -651,6 +877,170 @@ class WideContainerState extends State<WideContainer> {
       ],
     ));
   }
+}
+
+dynamic signIntoAccount(emailAddress, password) async {
+  try {
+    final credential = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: emailAddress, password: password);
+    print(credential);
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      print('No user found for that email.');
+    } else if (e.code == 'wrong-password') {
+      print('Wrong password provided for that user.');
+    }
+  }
+}
+
+dynamic createAccount(emailAddress, password) async {
+  try {
+    final credential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: emailAddress,
+      password: password,
+    );
+    print(credential);
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'weak-password') {
+      print('The password provided is too weak.');
+    } else if (e.code == 'email-already-in-use') {
+      print('The account already exists for that email.');
+    }
+  } catch (e) {
+    print(e);
+  }
+}
+
+//AUTHENTICATION
+
+//HOW TO DO THIS BELOW https://firebase.google.com/docs/database/flutter/read-and-write
+dynamic pushToFirebase() async {
+  DatabaseReference ref = FirebaseDatabase.instance.ref("YOUR_MOM/");
+
+  await ref.set({variables.pageData});
+//   await ref.update({
+//   "age": 19,
+// });
+// DatabaseReference ref = FirebaseDatabase.instance.ref("users");
+
+// await ref.update({
+//   "123/age": 19,
+//   "123/address/line1": "1 Mountain View",
+// });
+}
+
+dynamic resetAllData() {
+  variables.buttonOneImage = variables.rodAlone;
+  variables.buttonOneState = false;
+
+  variables.buttonTwoImage = variables.platAlone;
+  variables.buttonTwoState = false;
+
+  variables.button3Image = variables.rodAlone;
+  variables.button3State = false;
+
+  variables.button4Image = variables.rodAlone;
+  variables.button4State = false;
+
+  variables.button5Image = variables.platAlone;
+  variables.button5State = false;
+
+  variables.button6Image = variables.rodAlone;
+  variables.button6State = false;
+
+  variables.button7Image = variables.rodAlone;
+  variables.button7State = false;
+
+  variables.button8Image = variables.platAlone;
+  variables.button8State = false;
+
+  variables.button9Image = variables.rodAlone;
+  variables.button9State = false;
+
+  variables.button10Image = variables.rodAlone;
+  variables.button10State = false;
+
+  variables.button11Image = variables.platAlone;
+  variables.button11State = false;
+
+  variables.button12Image = variables.rodAlone;
+  variables.button12State = false;
+
+  variables.button13Image = variables.rodAlone;
+  variables.button13State = false;
+
+  variables.button14Image = variables.platAlone;
+  variables.button14State = false;
+
+  variables.button15Image = variables.rodAlone;
+  variables.button15State = false;
+
+  variables.button16Image = variables.rodAlone;
+  variables.button16State = false;
+
+  variables.button17Image = variables.platAlone;
+  variables.button17State = false;
+
+  variables.button18Image = variables.rodAlone;
+  variables.button18State = false;
+
+  variables.button19Image = variables.floorAlone;
+  variables.button19State = false;
+
+  variables.button20Image = variables.floorAlone;
+  variables.button20State = false;
+
+  variables.button21Image = variables.floorAlone;
+  variables.button21State = false;
+
+  variables.button22Image = variables.floorAlone;
+  variables.button22State = false;
+
+  variables.button23Image = variables.floorAlone;
+  variables.button23State = false;
+
+  variables.button24Image = variables.floorAlone;
+  variables.button24State = false;
+
+  variables.button25Image = variables.floorAlone;
+  variables.button25State = false;
+
+  variables.button26Image = variables.floorAlone;
+  variables.button26State = false;
+
+  variables.button27Image = variables.floorAlone;
+  variables.button27State = false;
+
+  variables.pageData = {
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+    6: false,
+    7: false,
+    8: false,
+    9: false,
+    10: false,
+    11: false,
+    12: false,
+    13: false,
+    14: false,
+    15: false,
+    16: false,
+    17: false,
+    18: false,
+    19: false,
+    20: false,
+    21: false,
+    22: false,
+    23: false,
+    24: false,
+    25: false,
+    26: false,
+    27: false,
+  };
 }
 
 dynamic buttonOneImage() {
