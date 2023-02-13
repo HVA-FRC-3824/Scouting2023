@@ -4,21 +4,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 bool authState = false;
 void main() async {
-//AUTHENTICATION
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseAuth.instance.authStateChanges().listen((User? user) {
-    if (user == null) {
-      print('User is currently signed out!');
-      authState = false;
-    } else {
-      authState = true;
-      print('User is signed in!');
-    }
-  });
+//  final counter = prefs.getStringList('pageData') ?? 0;
+//  prefs.remove('pageData');
+
   runApp(
     MaterialApp(
       title: 'Named Routes Demo',
@@ -37,10 +29,53 @@ void main() async {
       },
     ),
   );
+  final prefs = await SharedPreferences.getInstance();
+
+  try {
+    variables.usernameHello = prefs.getString('username') ?? '';
+    variables.password = prefs.getString('password') ?? '';
+    authState = true;
+  } on Error {
+    authState = false;
+  }
+
+//AUTHENTICATION
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // FirebaseAuth.instance.authStateChanges().listen((User? user) {
+  //   if (user == null) {
+  //     print('User is currently signed out!');
+  //     authState = false;
+  //   } else {
+  //     authState = true;
+  //     print('User is signed in!');
+  //   }
+  // });
+//This when not commented out sets the persistent storage to variables.pageData
+//DO NOT UNDER ANY CIRCUMSTANCES LEAVE THIS COMMENTED INTO THE CODE
+  await prefs.setStringList('pageData', variables.pageData);
 }
 
-class GeneralSignin extends StatelessWidget {
+class GeneralSignin extends StatefulWidget {
   const GeneralSignin({super.key});
+  @override
+  State<GeneralSignin> createState() => GeneralSigninState();
+}
+
+class GeneralSigninState extends State<GeneralSignin> {
+  // Create a text controller and use it to retrieve the current value
+  // of the TextField.
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    usernameController.dispose();
+    super.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,25 +88,27 @@ class GeneralSignin extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
-              child: const TextField(
-                decoration: InputDecoration(
+              padding: const EdgeInsets.all(20),
+              child: TextField(
+                controller: usernameController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'USERNAME',
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
-              child: const TextField(
-                decoration: InputDecoration(
+              padding: const EdgeInsets.all(20),
+              child: TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'PASSWORD',
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              padding: const EdgeInsets.all(20),
               child: TextButton(
                 style: const ButtonStyle(
                   backgroundColor:
@@ -83,25 +120,33 @@ class GeneralSignin extends StatelessWidget {
                   child: const Text('Login'),
                 ),
                 onPressed: () {
-                  authState = true;
+                  variables.usernameHello = usernameController.text;
+                  variables.password = passwordController.text;
+                  setUsernameAndPassword(
+                      usernameController.text, passwordController.text);
+                  signIntoAccount(
+                      usernameController.text, passwordController.text);
                   Navigator.pushNamed(context, '/');
                 },
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
-              child: TextButton(
-                style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll<Color>(Colors.grey),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.all(MediaQuery.of(context).size.height / 30),
+                child: TextButton(
+                  style: const ButtonStyle(
+                    backgroundColor:
+                        MaterialStatePropertyAll<Color>(Colors.grey),
+                  ),
+                  child: Container(
+                    margin:
+                        EdgeInsets.all(MediaQuery.of(context).size.height / 50),
+                    child: const Text('Create Acc?'),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/create');
+                  },
                 ),
-                child: Container(
-                  margin:
-                      EdgeInsets.all(MediaQuery.of(context).size.height / 50),
-                  child: const Text('Create Acc?'),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/create');
-                },
               ),
             ),
           ],
@@ -111,8 +156,33 @@ class GeneralSignin extends StatelessWidget {
   }
 }
 
-class CreateAccount extends StatelessWidget {
+dynamic setUsernameAndPassword(username, password) async {
+  final prefs = await SharedPreferences.getInstance();
+
+  await prefs.setString('username', username);
+  await prefs.setString('password', password);
+}
+
+class CreateAccount extends StatefulWidget {
   const CreateAccount({super.key});
+  @override
+  State<CreateAccount> createState() => CreateAccountState();
+}
+
+class CreateAccountState extends State<CreateAccount> {
+  // Create a text controller and use it to retrieve the current value
+  // of the TextField.
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    usernameController.dispose();
+    super.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,25 +195,27 @@ class CreateAccount extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
-              child: const TextField(
-                decoration: InputDecoration(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 25),
+              child: TextField(
+                controller: usernameController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'USERNAME',
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
-              child: const TextField(
-                decoration: InputDecoration(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 25),
+              child: TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'PASSWORD',
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 25),
               child: TextButton(
                 style: const ButtonStyle(
                   backgroundColor:
@@ -155,25 +227,39 @@ class CreateAccount extends StatelessWidget {
                   child: const Text('Create'),
                 ),
                 onPressed: () {
-                  authState = true;
-                  Navigator.pushNamed(context, '/');
+                  setUsernameAndPassword(
+                    usernameController.text,
+                    passwordController.text,
+                  );
+
+                  createAccount(
+                    usernameController.text,
+                    passwordController.text,
+                  );
+                  print(usernameController.text);
+                  print(passwordController.text);
+                  //authState = true;
+                  //Navigator.pushNamed(context, '/');
                 },
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
-              child: TextButton(
-                style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll<Color>(Colors.grey),
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.all(20),
+                child: TextButton(
+                  style: const ButtonStyle(
+                    backgroundColor:
+                        MaterialStatePropertyAll<Color>(Colors.grey),
+                  ),
+                  child: Container(
+                    margin:
+                        EdgeInsets.all(MediaQuery.of(context).size.height / 50),
+                    child: const Text('Sign In?'),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/signin');
+                  },
                 ),
-                child: Container(
-                  margin:
-                      EdgeInsets.all(MediaQuery.of(context).size.height / 50),
-                  child: const Text('Sign In?'),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/signin');
-                },
               ),
             ),
           ],
@@ -217,7 +303,7 @@ class FirstScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
             child: TextButton(
-              child: Text('Login'),
+              child: const Text('Login'),
               onPressed: () {
                 Navigator.pushNamed(context, '/signin');
               },
@@ -226,7 +312,7 @@ class FirstScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(MediaQuery.of(context).size.height / 20),
             child: TextButton(
-              child: Text('Create Account?'),
+              child: const Text('Create Account'),
               onPressed: () {
                 Navigator.pushNamed(context, '/create');
               },
@@ -344,9 +430,15 @@ class SecondScreenState extends State<SecondScreen> {
             ),
             // Within the `FirstScreen` widget
             onPressed: () {
-              //pushToFirebase(); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
-              buttonPressed();
+              pageDataIndexToRobotNum(3824);
+              pageDataIndexToMatchNum(14);
+              savePageDataToPrefs();
+              pushToFirebase(
+                15,
+                3824,
+              ); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
               resetAllData();
+              buttonPressed();
             },
           )
         ],
@@ -879,6 +971,54 @@ class SecondScreenState extends State<SecondScreen> {
   }
 }
 
+dynamic pageDataIndexToRobotNum(robotNum) {
+  variables.pageData[28] = robotNum.toString();
+}
+
+dynamic pageDataIndexToMatchNum(matchNum) {
+  variables.pageData[27] = matchNum.toString();
+}
+
+dynamic savePageDataToPrefs() async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setStringList('pageData', variables.pageData);
+}
+
+dynamic pushToFirebase(matchNumber, robotNumber) async {
+  var tempMatch = matchNumber.toString();
+  var tempBot = robotNumber.toString();
+  var username = variables.pageData[29];
+
+  DatabaseReference ref = FirebaseDatabase.instance
+      .ref('2023/' + variables.usernameHello + '/' + tempMatch + '/' + tempBot);
+
+  await ref.set({'information': (variables.pageData).toString()});
+  // try {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   FirebaseDatabase database = FirebaseDatabase.instance;
+  //   DatabaseReference ref = database.ref("2023/${variables.username}");
+  // } on Error {
+  //   print('something before this await happens wrong');
+  // }
+  // try {
+  //   await ref.set({
+  //     'information': (variables.pageData).toString(),
+  //   });
+  // } on Error {
+  //   print('something happened somewhere else instead');
+  // }
+
+//   await ref.update({
+//   "age": 19,
+// });
+// DatabaseReference ref = FirebaseDatabase.instance.ref("users");
+
+// await ref.update({
+//   "123/age": 19,
+//   "123/address/line1": "1 Mountain View",
+// });
+}
+
 dynamic signIntoAccount(emailAddress, password) async {
   try {
     final credential = await FirebaseAuth.instance
@@ -897,8 +1037,8 @@ dynamic createAccount(emailAddress, password) async {
   try {
     final credential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: emailAddress,
-      password: password,
+      email: emailAddress.toString(),
+      password: password.toString(),
     );
     print(credential);
   } on FirebaseAuthException catch (e) {
@@ -915,20 +1055,6 @@ dynamic createAccount(emailAddress, password) async {
 //AUTHENTICATION
 
 //HOW TO DO THIS BELOW https://firebase.google.com/docs/database/flutter/read-and-write
-dynamic pushToFirebase() async {
-  DatabaseReference ref = FirebaseDatabase.instance.ref("YOUR_MOM/");
-
-  await ref.set({variables.pageData});
-//   await ref.update({
-//   "age": 19,
-// });
-// DatabaseReference ref = FirebaseDatabase.instance.ref("users");
-
-// await ref.update({
-//   "123/age": 19,
-//   "123/address/line1": "1 Mountain View",
-// });
-}
 
 dynamic resetAllData() {
   variables.buttonOneImage = variables.rodAlone;
@@ -1012,35 +1138,37 @@ dynamic resetAllData() {
   variables.button27Image = variables.floorAlone;
   variables.button27State = false;
 
-  variables.pageData = {
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-    6: false,
-    7: false,
-    8: false,
-    9: false,
-    10: false,
-    11: false,
-    12: false,
-    13: false,
-    14: false,
-    15: false,
-    16: false,
-    17: false,
-    18: false,
-    19: false,
-    20: false,
-    21: false,
-    22: false,
-    23: false,
-    24: false,
-    25: false,
-    26: false,
-    27: false,
-  };
+  variables.pageData = [
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    'MatchNum',
+    'RobotNum',
+  ];
 }
 
 dynamic buttonOneImage() {
@@ -1315,8 +1443,8 @@ dynamic button27Image() {
 
 dynamic buttonIndexChanger(buttonNumber, buttonstate) {
   if (buttonstate) {
-    variables.pageData[buttonNumber] = true;
+    variables.pageData[buttonNumber] = '1';
   } else {
-    variables.pageData[buttonNumber] = false;
+    variables.pageData[buttonNumber] = '0';
   }
 }
