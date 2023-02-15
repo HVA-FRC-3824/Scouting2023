@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool authState = false;
+
 void main() async {
 //  final counter = prefs.getStringList('pageData') ?? 0;
 //  prefs.remove('pageData');
@@ -29,19 +30,23 @@ void main() async {
       },
     ),
   );
-  final prefs = await SharedPreferences.getInstance();
-
-  try {
-    variables.usernameHello = prefs.getString('username') ?? '';
-    variables.password = prefs.getString('password') ?? '';
-    authState = true;
-  } on Error {
-    authState = false;
-  }
-
 //AUTHENTICATION
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (3 != 3) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+          apiKey: "",
+          authDomain: "",
+          databaseURL: "", // **DATABASEURL MUST BE GIVEN.**
+          projectId: "",
+          storageBucket: "",
+          messagingSenderId: "",
+          appId: ""),
+    );
+  } else {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+  }
   // FirebaseAuth.instance.authStateChanges().listen((User? user) {
   //   if (user == null) {
   //     print('User is currently signed out!');
@@ -53,7 +58,7 @@ void main() async {
   // });
 //This when not commented out sets the persistent storage to variables.pageData
 //DO NOT UNDER ANY CIRCUMSTANCES LEAVE THIS COMMENTED INTO THE CODE
-  await prefs.setStringList('pageData', variables.pageData);
+//await prefs.setStringList('pageData', variables.pageData);
 }
 
 class GeneralSignin extends StatefulWidget {
@@ -120,10 +125,10 @@ class GeneralSigninState extends State<GeneralSignin> {
                   child: const Text('Login'),
                 ),
                 onPressed: () {
-                  variables.usernameHello = usernameController.text;
+                  authState = true;
+                  variables.pageData[29] = usernameController.text;
                   variables.password = passwordController.text;
-                  setUsernameAndPassword(
-                      usernameController.text, passwordController.text);
+                  setStringSP('username', usernameController.text);
                   signIntoAccount(
                       usernameController.text, passwordController.text);
                   Navigator.pushNamed(context, '/');
@@ -154,13 +159,6 @@ class GeneralSigninState extends State<GeneralSignin> {
       ),
     );
   }
-}
-
-dynamic setUsernameAndPassword(username, password) async {
-  final prefs = await SharedPreferences.getInstance();
-
-  await prefs.setString('username', username);
-  await prefs.setString('password', password);
 }
 
 class CreateAccount extends StatefulWidget {
@@ -226,12 +224,8 @@ class CreateAccountState extends State<CreateAccount> {
                       EdgeInsets.all(MediaQuery.of(context).size.height / 30),
                   child: const Text('Create'),
                 ),
-                onPressed: () {
-                  setUsernameAndPassword(
-                    usernameController.text,
-                    passwordController.text,
-                  );
-
+                onPressed: () async {
+                  setStringSP('username', usernameController.text);
                   createAccount(
                     usernameController.text,
                     passwordController.text,
@@ -282,6 +276,13 @@ class FirstScreen extends StatelessWidget {
       ),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
+          Future.delayed(const Duration(milliseconds: 700), () {
+            if (authState == false) {
+              return loginScreen(context);
+            } else {
+              return buildNormalHome(context);
+            }
+          });
           if (authState == false) {
             return loginScreen(context);
           } else {
@@ -395,7 +396,7 @@ class SecondScreen extends StatefulWidget {
 }
 
 class SecondScreenState extends State<SecondScreen> {
-  void buttonPressed() {
+  void buttonPressed() async {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -416,7 +417,10 @@ class SecondScreenState extends State<SecondScreen> {
             style: TextStyle(color: Colors.white),
           ),
           onPressed: () {
-            Navigator.pop(context);
+            pageDataIndexToRobotNum(3824).timeout(Duration(milliseconds: 500));
+            pageDataIndexToMatchNum(14).timeout(Duration(milliseconds: 500));
+            setPageDataSP(20, 3824).timeout(Duration(milliseconds: 500));
+            //Navigator.pop(context);
           },
         ),
         title: const Text('Second Screen'),
@@ -429,16 +433,11 @@ class SecondScreenState extends State<SecondScreen> {
               ),
             ),
             // Within the `FirstScreen` widget
-            onPressed: () {
-              pageDataIndexToRobotNum(3824);
-              pageDataIndexToMatchNum(14);
-              savePageDataToPrefs();
-              pushToFirebase(
-                15,
-                3824,
-              ); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
-              resetAllData();
-              buttonPressed();
+            onPressed: () async {
+              pushToFirebase(15, 3824,
+                  29); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
+              // resetAllData();
+              // buttonPressed();
             },
           )
         ],
@@ -971,26 +970,29 @@ class SecondScreenState extends State<SecondScreen> {
   }
 }
 
-dynamic pageDataIndexToRobotNum(robotNum) {
+dynamic pageDataIndexToRobotNum(robotNum) async {
   variables.pageData[28] = robotNum.toString();
 }
 
-dynamic pageDataIndexToMatchNum(matchNum) {
+dynamic pageDataIndexToMatchNum(matchNum) async {
   variables.pageData[27] = matchNum.toString();
 }
 
-dynamic savePageDataToPrefs() async {
-  final prefs = await SharedPreferences.getInstance();
-  prefs.setStringList('pageData', variables.pageData);
-}
-
-dynamic pushToFirebase(matchNumber, robotNumber) async {
+dynamic pushToFirebase(matchNumber, robotNumber, index) async {
   var tempMatch = matchNumber.toString();
   var tempBot = robotNumber.toString();
   var username = variables.pageData[29];
+  try {
+    tempMatch = matchNumber.toString();
+    tempBot = robotNumber.toString();
+
+    username = variables.pageData[29];
+  } on Error {
+    print("well shit bro");
+  }
 
   DatabaseReference ref = FirebaseDatabase.instance
-      .ref('2023/' + variables.usernameHello + '/' + tempMatch + '/' + tempBot);
+      .ref('2023/' + username + '/' + tempMatch + '/' + tempBot);
 
   await ref.set({'information': (variables.pageData).toString()});
   // try {
@@ -1056,7 +1058,24 @@ dynamic createAccount(emailAddress, password) async {
 
 //HOW TO DO THIS BELOW https://firebase.google.com/docs/database/flutter/read-and-write
 
-dynamic resetAllData() {
+dynamic setPageDataSP(matchNumber, robotNumber) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setStringList(
+    matchNumber.toString() + '/' + robotNumber.toString() + '/pageData',
+    variables.pageData,
+  );
+}
+
+void setStringSP(stringNameinSP, stringValue) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString(stringNameinSP, stringValue);
+}
+
+void getPageDataSP() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+}
+
+dynamic resetAllData() async {
   variables.buttonOneImage = variables.rodAlone;
   variables.buttonOneState = false;
 

@@ -6,6 +6,8 @@ var platBlock = const AssetImage('assets/images/thumbnail_platblock.png');
 var platAlone = const AssetImage('assets/images/thumbnail_plat.png');
 var floorAlone = const AssetImage('assets/images/thumbnail_empty.png');
 var floorCargo = const AssetImage('assets/images/thumbnail_floor.png');
+var baseUser = "blankUsername";
+var basePin = "blankPassword";
 
 var buttonOneImage = rodAlone;
 var buttonOneState = false;
@@ -120,11 +122,9 @@ List<String> pageData = [
   '0',
   'MatchNum',
   'RobotNum',
-  'username',
+  'ljd223@gmail.com',
 ];
 
 var testVar = false;
 
-var usernameHello = 'blank';
-
-var password = 'blank';
+var password = basePin;
