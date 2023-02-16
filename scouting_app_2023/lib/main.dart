@@ -5,13 +5,13 @@ import 'firebase_options.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:scouting_app_2023/sharedPrefs.dart' as prefs;
 
 bool authState = false;
 
 void main() async {
 //  final counter = prefs.getStringList('pageData') ?? 0;
 //  prefs.remove('pageData');
-
   runApp(
     MaterialApp(
       title: 'Named Routes Demo',
@@ -24,12 +24,16 @@ void main() async {
         // When navigating to the "/second" route, build the SecondScreen widget.
         '/grid': (context) => const SecondScreen(),
 
+        '/prep': (context) => const PrepScreen(),
+
         '/create': (context) => const CreateAccount(),
 
         '/signin': (context) => const GeneralSignin(),
       },
     ),
   );
+
+  prefs.setFirebasePush();
 //AUTHENTICATION
   WidgetsFlutterBinding.ensureInitialized();
   if (3 != 3) {
@@ -128,9 +132,18 @@ class GeneralSigninState extends State<GeneralSignin> {
                   authState = true;
                   variables.pageData[29] = usernameController.text;
                   variables.password = passwordController.text;
-                  setStringSP('username', usernameController.text);
+                  prefs.setStringSP('username', usernameController.text);
                   signIntoAccount(
                       usernameController.text, passwordController.text);
+                  // FirebaseAuth.instance.authStateChanges().listen((User? user) {
+                  //   if (user == null) {
+                  //     print('User is currently signed out!');
+                  //     authState = false;
+                  //   } else {
+                  //     authState = true;
+                  //     print('User is signed in!');
+                  //   }
+                  // });
                   Navigator.pushNamed(context, '/');
                 },
               ),
@@ -225,7 +238,7 @@ class CreateAccountState extends State<CreateAccount> {
                   child: const Text('Create'),
                 ),
                 onPressed: () async {
-                  setStringSP('username', usernameController.text);
+                  prefs.setStringSP('username', usernameController.text);
                   createAccount(
                     usernameController.text,
                     passwordController.text,
@@ -356,7 +369,7 @@ class FirstScreen extends StatelessWidget {
               // Within the `FirstScreen` widget
               onPressed: () {
                 // Navigate to the second screen using a named route.
-                Navigator.pushNamed(context, '/grid');
+                Navigator.pushNamed(context, '/prep');
               },
               child: Text(
                 'Scouting Page',
@@ -383,6 +396,71 @@ class FirstScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class PrepScreen extends StatefulWidget {
+  const PrepScreen({super.key});
+
+  @override
+  State<PrepScreen> createState() => PrepScreenState();
+}
+
+class PrepScreenState extends State<PrepScreen> {
+  @override
+  Widget build(BuildContext context) {
+    var matchNumberController = TextEditingController();
+    var robotNumberController = TextEditingController();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('MatchPrep'),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 25),
+              child: TextField(
+                controller: matchNumberController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'MATCH NUMBER',
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 25),
+              child: TextField(
+                controller: robotNumberController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'ROBOT NUMBER',
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.height / 25),
+              child: TextButton(
+                style: const ButtonStyle(
+                  backgroundColor:
+                      MaterialStatePropertyAll<Color>(Colors.amber),
+                ),
+                child: Container(
+                  margin:
+                      EdgeInsets.all(MediaQuery.of(context).size.height / 30),
+                  child: const Text('Start Scouting'),
+                ),
+                onPressed: () {
+                  variables.pageData[27] = matchNumberController.text;
+                  variables.pageData[28] = robotNumberController.text;
+                  Navigator.pushNamed(context, '/grid');
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -417,10 +495,7 @@ class SecondScreenState extends State<SecondScreen> {
             style: TextStyle(color: Colors.white),
           ),
           onPressed: () {
-            pageDataIndexToRobotNum(3824).timeout(Duration(milliseconds: 500));
-            pageDataIndexToMatchNum(14).timeout(Duration(milliseconds: 500));
-            setPageDataSP(20, 3824).timeout(Duration(milliseconds: 500));
-            //Navigator.pop(context);
+            Navigator.pop(context);
           },
         ),
         title: const Text('Second Screen'),
@@ -433,9 +508,13 @@ class SecondScreenState extends State<SecondScreen> {
               ),
             ),
             // Within the `FirstScreen` widget
-            onPressed: () async {
-              pushToFirebase(15, 3824,
-                  29); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
+            onPressed: () {
+              prefs.setPageDataSP(
+                  variables.pageData[27], variables.pageData[28]);
+              prefs.setFirebasePush();
+              Future.delayed(const Duration(milliseconds: 300), () {
+                pushToFirebase();
+              }); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
               // resetAllData();
               // buttonPressed();
             },
@@ -514,10 +593,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             buttonOneImage();
             if (variables.buttonOneState == false) {
-              buttonIndexChanger(1, true);
+              buttonIndexChanger(0, true);
               variables.buttonOneState = true;
             } else {
-              buttonIndexChanger(1, false);
+              buttonIndexChanger(0, false);
               variables.buttonOneState = false;
             }
             buttonPressed();
@@ -531,10 +610,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             buttonTwoImage();
             if (variables.buttonTwoState == false) {
-              buttonIndexChanger(2, true);
+              buttonIndexChanger(1, true);
               variables.buttonTwoState = true;
             } else {
-              buttonIndexChanger(2, false);
+              buttonIndexChanger(1, false);
               variables.buttonTwoState = false;
             }
             buttonPressed();
@@ -548,10 +627,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button3Image();
             if (variables.button3State == false) {
-              buttonIndexChanger(3, true);
+              buttonIndexChanger(2, true);
               variables.button3State = true;
             } else {
-              buttonIndexChanger(3, false);
+              buttonIndexChanger(2, false);
               variables.button3State = false;
             }
             buttonPressed();
@@ -565,10 +644,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button4Image();
             if (variables.button4State == false) {
-              buttonIndexChanger(4, true);
+              buttonIndexChanger(3, true);
               variables.button4State = true;
             } else {
-              buttonIndexChanger(4, false);
+              buttonIndexChanger(3, false);
               variables.button4State = false;
             }
             buttonPressed();
@@ -582,10 +661,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button5Image();
             if (variables.button5State == false) {
-              buttonIndexChanger(5, true);
+              buttonIndexChanger(4, true);
               variables.button5State = true;
             } else {
-              buttonIndexChanger(5, false);
+              buttonIndexChanger(4, false);
               variables.button5State = false;
             }
             buttonPressed();
@@ -599,10 +678,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button6Image();
             if (variables.button6State == false) {
-              buttonIndexChanger(6, true);
+              buttonIndexChanger(5, true);
               variables.button6State = true;
             } else {
-              buttonIndexChanger(6, false);
+              buttonIndexChanger(5, false);
               variables.button6State = false;
             }
             buttonPressed();
@@ -616,10 +695,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button7Image();
             if (variables.button7State == false) {
-              buttonIndexChanger(7, true);
+              buttonIndexChanger(6, true);
               variables.button7State = true;
             } else {
-              buttonIndexChanger(7, false);
+              buttonIndexChanger(6, false);
               variables.button7State = false;
             }
             buttonPressed();
@@ -633,10 +712,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button8Image();
             if (variables.button8State == false) {
-              buttonIndexChanger(8, true);
+              buttonIndexChanger(7, true);
               variables.button8State = true;
             } else {
-              buttonIndexChanger(8, false);
+              buttonIndexChanger(7, false);
               variables.button8State = false;
             }
             buttonPressed();
@@ -650,10 +729,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button9Image();
             if (variables.button9State == false) {
-              buttonIndexChanger(9, true);
+              buttonIndexChanger(8, true);
               variables.button9State = true;
             } else {
-              buttonIndexChanger(9, false);
+              buttonIndexChanger(8, false);
               variables.button9State = false;
             }
             buttonPressed();
@@ -667,10 +746,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button10Image();
             if (variables.button10State == false) {
-              buttonIndexChanger(10, true);
+              buttonIndexChanger(9, true);
               variables.button10State = true;
             } else {
-              buttonIndexChanger(10, false);
+              buttonIndexChanger(9, false);
               variables.button10State = false;
             }
             buttonPressed();
@@ -684,10 +763,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button11Image();
             if (variables.button11State == false) {
-              buttonIndexChanger(11, true);
+              buttonIndexChanger(10, true);
               variables.button11State = true;
             } else {
-              buttonIndexChanger(11, false);
+              buttonIndexChanger(10, false);
               variables.button11State = false;
             }
             buttonPressed();
@@ -701,10 +780,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button12Image();
             if (variables.button12State == false) {
-              buttonIndexChanger(12, true);
+              buttonIndexChanger(11, true);
               variables.button12State = true;
             } else {
-              buttonIndexChanger(12, false);
+              buttonIndexChanger(11, false);
               variables.button12State = false;
             }
             buttonPressed();
@@ -718,10 +797,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button13Image();
             if (variables.button13State == false) {
-              buttonIndexChanger(13, true);
+              buttonIndexChanger(12, true);
               variables.button13State = true;
             } else {
-              buttonIndexChanger(13, false);
+              buttonIndexChanger(12, false);
               variables.button13State = false;
             }
             buttonPressed();
@@ -735,10 +814,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button14Image();
             if (variables.button14State == false) {
-              buttonIndexChanger(14, true);
+              buttonIndexChanger(13, true);
               variables.button14State = true;
             } else {
-              buttonIndexChanger(14, false);
+              buttonIndexChanger(13, false);
               variables.button14State = false;
             }
             buttonPressed();
@@ -752,10 +831,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button15Image();
             if (variables.button15State == false) {
-              buttonIndexChanger(15, true);
+              buttonIndexChanger(14, true);
               variables.button15State = true;
             } else {
-              buttonIndexChanger(15, false);
+              buttonIndexChanger(14, false);
               variables.button15State = false;
             }
             buttonPressed();
@@ -769,10 +848,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button16Image();
             if (variables.button16State == false) {
-              buttonIndexChanger(16, true);
+              buttonIndexChanger(15, true);
               variables.button16State = true;
             } else {
-              buttonIndexChanger(16, false);
+              buttonIndexChanger(15, false);
               variables.button16State = false;
             }
             buttonPressed();
@@ -786,10 +865,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button17Image();
             if (variables.button17State == false) {
-              buttonIndexChanger(17, true);
+              buttonIndexChanger(16, true);
               variables.button17State = true;
             } else {
-              buttonIndexChanger(17, false);
+              buttonIndexChanger(16, false);
               variables.button17State = false;
             }
             buttonPressed();
@@ -803,10 +882,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button18Image();
             if (variables.button18State == false) {
-              buttonIndexChanger(18, true);
+              buttonIndexChanger(17, true);
               variables.button18State = true;
             } else {
-              buttonIndexChanger(18, false);
+              buttonIndexChanger(17, false);
               variables.button18State = false;
             }
             buttonPressed();
@@ -820,10 +899,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button19Image();
             if (variables.button19State == false) {
-              buttonIndexChanger(19, true);
+              buttonIndexChanger(18, true);
               variables.button19State = true;
             } else {
-              buttonIndexChanger(19, false);
+              buttonIndexChanger(18, false);
               variables.button19State = false;
             }
             buttonPressed();
@@ -837,10 +916,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button20Image();
             if (variables.button20State == false) {
-              buttonIndexChanger(20, true);
+              buttonIndexChanger(19, true);
               variables.button20State = true;
             } else {
-              buttonIndexChanger(20, false);
+              buttonIndexChanger(19, false);
               variables.button20State = false;
             }
             buttonPressed();
@@ -854,10 +933,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button21Image();
             if (variables.button21State == false) {
-              buttonIndexChanger(21, true);
+              buttonIndexChanger(20, true);
               variables.button21State = true;
             } else {
-              buttonIndexChanger(21, false);
+              buttonIndexChanger(20, false);
               variables.button21State = false;
             }
             buttonPressed();
@@ -871,10 +950,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button22Image();
             if (variables.button22State == false) {
-              buttonIndexChanger(22, true);
+              buttonIndexChanger(21, true);
               variables.button22State = true;
             } else {
-              buttonIndexChanger(22, false);
+              buttonIndexChanger(21, false);
               variables.button22State = false;
             }
             buttonPressed();
@@ -888,10 +967,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button23Image();
             if (variables.button23State == false) {
-              buttonIndexChanger(23, true);
+              buttonIndexChanger(22, true);
               variables.button23State = true;
             } else {
-              buttonIndexChanger(23, false);
+              buttonIndexChanger(22, false);
               variables.button23State = false;
             }
             buttonPressed();
@@ -905,10 +984,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button24Image();
             if (variables.button24State == false) {
-              buttonIndexChanger(24, true);
+              buttonIndexChanger(23, true);
               variables.button24State = true;
             } else {
-              buttonIndexChanger(24, false);
+              buttonIndexChanger(23, false);
               variables.button24State = false;
             }
             buttonPressed();
@@ -922,10 +1001,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button25Image();
             if (variables.button25State == false) {
-              buttonIndexChanger(25, true);
+              buttonIndexChanger(24, true);
               variables.button25State = true;
             } else {
-              buttonIndexChanger(25, false);
+              buttonIndexChanger(24, false);
               variables.button25State = false;
             }
             buttonPressed();
@@ -939,10 +1018,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button26Image();
             if (variables.button26State == false) {
-              buttonIndexChanger(26, true);
+              buttonIndexChanger(25, true);
               variables.button26State = true;
             } else {
-              buttonIndexChanger(26, false);
+              buttonIndexChanger(25, false);
               variables.button26State = false;
             }
             buttonPressed();
@@ -956,10 +1035,10 @@ class SecondScreenState extends State<SecondScreen> {
           onPressed: () {
             button27Image();
             if (variables.button27State == false) {
-              buttonIndexChanger(27, true);
+              buttonIndexChanger(26, true);
               variables.button27State = true;
             } else {
-              buttonIndexChanger(27, false);
+              buttonIndexChanger(26, false);
               variables.button27State = false;
             }
             buttonPressed();
@@ -978,23 +1057,24 @@ dynamic pageDataIndexToMatchNum(matchNum) async {
   variables.pageData[27] = matchNum.toString();
 }
 
-dynamic pushToFirebase(matchNumber, robotNumber, index) async {
-  var tempMatch = matchNumber.toString();
-  var tempBot = robotNumber.toString();
-  var username = variables.pageData[29];
-  try {
-    tempMatch = matchNumber.toString();
-    tempBot = robotNumber.toString();
-
-    username = variables.pageData[29];
-  } on Error {
-    print("well shit bro");
+dynamic pushToFirebase() {
+  var index = 0;
+  var jndex = 0;
+  for (var i = index; i < 150; i++) {
+    if (variables.firebasePush.containsKey(i.toString())) {
+      for (var j = jndex; j < 9999; j++) {
+        if (variables.firebasePush[i.toString()].containsKey(j.toString())) {
+          print('this function ran');
+          DatabaseReference ref = FirebaseDatabase.instance
+              .ref('2023/' + i.toString() + '/' + j.toString() + '/');
+          ref.set({
+            'pageData': variables.firebasePush[i.toString()][j.toString()]
+                ['pageData']
+          });
+        }
+      }
+    }
   }
-
-  DatabaseReference ref = FirebaseDatabase.instance
-      .ref('2023/' + username + '/' + tempMatch + '/' + tempBot);
-
-  await ref.set({'information': (variables.pageData).toString()});
   // try {
   //   final prefs = await SharedPreferences.getInstance();
   //   FirebaseDatabase database = FirebaseDatabase.instance;
@@ -1058,22 +1138,9 @@ dynamic createAccount(emailAddress, password) async {
 
 //HOW TO DO THIS BELOW https://firebase.google.com/docs/database/flutter/read-and-write
 
-dynamic setPageDataSP(matchNumber, robotNumber) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setStringList(
-    matchNumber.toString() + '/' + robotNumber.toString() + '/pageData',
-    variables.pageData,
-  );
-}
-
-void setStringSP(stringNameinSP, stringValue) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString(stringNameinSP, stringValue);
-}
-
-void getPageDataSP() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-}
+// void getPageDataSP() async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+// }
 
 dynamic resetAllData() async {
   variables.buttonOneImage = variables.rodAlone;

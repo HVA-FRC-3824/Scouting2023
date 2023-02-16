@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 var rodAlone = const AssetImage('assets/images/thumbnail_rod.png');
@@ -90,7 +92,7 @@ var button26State = false;
 var button27Image = floorAlone;
 var button27State = false;
 
-List<String> slist = ["hello", "how", "are", "you"];
+var firebasePush = {};
 
 List<String> pageData = [
   '0',
