@@ -24,12 +24,15 @@ void setStringSP(stringNameinSP, stringValue) async {
 var run = 0;
 
 void setFirebasePush() async {
+  print('this is running');
   final prefs = await SharedPreferences.getInstance();
   var match = 0; //matchNumber
   var bot = 0; //robotNumber
   var username;
+  print(prefs);
+  print('this is running2222');
   try {
-    if (prefs.containsKey(username)) {
+    if (prefs.containsKey('username')) {
       username = prefs.getString('username');
       variables.firebasePush['username'] = username;
     }
@@ -50,3 +53,12 @@ void setFirebasePush() async {
     }
   }
 }
+
+// void setUserFromSP() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   if (prefs.containsKey('username')) {
+//     final String? action = prefs.getString('username');
+
+//     variables.pageData[29] = action;
+//   }
+// }

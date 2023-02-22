@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 
 var rodAlone = const AssetImage('assets/images/thumbnail_rod.png');

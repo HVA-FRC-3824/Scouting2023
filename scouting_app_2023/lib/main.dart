@@ -10,6 +10,8 @@ import 'package:scouting_app_2023/sharedPrefs.dart' as prefs;
 bool authState = false;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 //  final counter = prefs.getStringList('pageData') ?? 0;
 //  prefs.remove('pageData');
   runApp(
@@ -47,10 +49,7 @@ void main() async {
           messagingSenderId: "",
           appId: ""),
     );
-  } else {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-  }
+  } else {}
   // FirebaseAuth.instance.authStateChanges().listen((User? user) {
   //   if (user == null) {
   //     print('User is currently signed out!');
@@ -129,22 +128,22 @@ class GeneralSigninState extends State<GeneralSignin> {
                   child: const Text('Login'),
                 ),
                 onPressed: () {
-                  authState = true;
                   variables.pageData[29] = usernameController.text;
                   variables.password = passwordController.text;
                   prefs.setStringSP('username', usernameController.text);
                   signIntoAccount(
                       usernameController.text, passwordController.text);
-                  // FirebaseAuth.instance.authStateChanges().listen((User? user) {
-                  //   if (user == null) {
-                  //     print('User is currently signed out!');
-                  //     authState = false;
-                  //   } else {
-                  //     authState = true;
-                  //     print('User is signed in!');
-                  //   }
-                  // });
-                  Navigator.pushNamed(context, '/');
+                  FirebaseAuth.instance.authStateChanges().listen((User? user) {
+                    if (user == null) {
+                      print('User is currently signed out!');
+                      authState = false;
+                    } else {
+                      authState = true;
+
+                      Navigator.pushNamed(context, '/');
+                      print('User is signed in!');
+                    }
+                  });
                 },
               ),
             ),
@@ -238,15 +237,28 @@ class CreateAccountState extends State<CreateAccount> {
                   child: const Text('Create'),
                 ),
                 onPressed: () async {
-                  prefs.setStringSP('username', usernameController.text);
                   createAccount(
                     usernameController.text,
                     passwordController.text,
                   );
-                  print(usernameController.text);
-                  print(passwordController.text);
+                  signIntoAccount(
+                      usernameController.text, passwordController.text);
                   //authState = true;
                   //Navigator.pushNamed(context, '/');
+                  variables.pageData[29] = usernameController.text;
+                  variables.password = passwordController.text;
+                  prefs.setStringSP('username', usernameController.text);
+                  FirebaseAuth.instance.authStateChanges().listen((User? user) {
+                    if (user == null) {
+                      print('User is currently signed out!');
+                      authState = false;
+                    } else {
+                      authState = true;
+
+                      Navigator.pushNamed(context, '/');
+                      print('User is signed in!');
+                    }
+                  });
                 },
               ),
             ),
@@ -280,6 +292,16 @@ class FirstScreen extends StatelessWidget {
   const FirstScreen({super.key});
   @override
   Widget build(BuildContext context) {
+    var tempState;
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (authState == false) {
+        print("user got signed out");
+        tempState = false;
+      } else if (authState == true) {
+        print("user got signed in");
+        tempState = true;
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: MediaQuery.of(context).size.height * .10,
@@ -288,21 +310,14 @@ class FirstScreen extends StatelessWidget {
         title: const Text('Home'),
       ),
       body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          Future.delayed(const Duration(milliseconds: 700), () {
-            if (authState == false) {
-              return loginScreen(context);
-            } else {
-              return buildNormalHome(context);
-            }
-          });
-          if (authState == false) {
-            return loginScreen(context);
-          } else {
-            return buildNormalHome(context);
-          }
-        },
-      ),
+          builder: (BuildContext context, BoxConstraints constraints) {
+        if (tempState == true) {
+          return buildNormalHome(context);
+        } else if (tempState == false) {
+          return loginScreen(context);
+        }
+        return buildNormalHome(context);
+      }),
     );
   }
 
@@ -515,8 +530,21 @@ class SecondScreenState extends State<SecondScreen> {
               Future.delayed(const Duration(milliseconds: 300), () {
                 pushToFirebase();
               }); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
-              // resetAllData();
-              // buttonPressed();
+              var times = 0;
+              while (times < 10) {
+                print("looping while loop");
+                Future.delayed(const Duration(milliseconds: 1000), () {
+                  print("this is not running");
+                  if (firebasePushVar == 1) {
+                    resetAllData();
+                    times = 11;
+                  }
+                });
+
+                times = times + 1;
+              }
+              buttonPressed();
+              Navigator.pop(context);
             },
           )
         ],
@@ -1057,6 +1085,7 @@ dynamic pageDataIndexToMatchNum(matchNum) async {
   variables.pageData[27] = matchNum.toString();
 }
 
+var firebasePushVar = 0;
 dynamic pushToFirebase() {
   var index = 0;
   var jndex = 0;
@@ -1075,6 +1104,7 @@ dynamic pushToFirebase() {
       }
     }
   }
+  firebasePushVar = 1;
   // try {
   //   final prefs = await SharedPreferences.getInstance();
   //   FirebaseDatabase database = FirebaseDatabase.instance;
@@ -1143,6 +1173,8 @@ dynamic createAccount(emailAddress, password) async {
 // }
 
 dynamic resetAllData() async {
+  firebasePushVar = 0;
+
   variables.buttonOneImage = variables.rodAlone;
   variables.buttonOneState = false;
 
