@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_app_2023/variables.dart' as variables;
 import 'package:firebase_core/firebase_core.dart';
@@ -19,7 +20,7 @@ void main() async {
       title: 'Named Routes Demo',
       // Start the app with the "/" named route. In this case, the app starts
       // on the FirstScreen widget.
-      initialRoute: '/',
+      initialRoute: '/auto',
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => const FirstScreen(),
@@ -31,6 +32,10 @@ void main() async {
         '/create': (context) => const CreateAccount(),
 
         '/signin': (context) => const GeneralSignin(),
+
+        '/endgame': (context) => const Endgame(),
+
+        '/auto': (context) => const Auto(),
       },
     ),
   );
@@ -89,6 +94,8 @@ class GeneralSigninState extends State<GeneralSignin> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
         leading: Container(),
         title: const Text('login'),
       ),
@@ -128,7 +135,7 @@ class GeneralSigninState extends State<GeneralSignin> {
                   child: const Text('Login'),
                 ),
                 onPressed: () {
-                  variables.pageData[29] = usernameController.text;
+                  variables.pageData[37] = usernameController.text;
                   variables.password = passwordController.text;
                   prefs.setStringSP('username', usernameController.text);
                   signIntoAccount(
@@ -198,6 +205,8 @@ class CreateAccountState extends State<CreateAccount> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
         leading: Container(),
         title: const Text('Account Creation'),
       ),
@@ -245,7 +254,7 @@ class CreateAccountState extends State<CreateAccount> {
                       usernameController.text, passwordController.text);
                   //authState = true;
                   //Navigator.pushNamed(context, '/');
-                  variables.pageData[29] = usernameController.text;
+                  variables.pageData[37] = usernameController.text;
                   variables.password = passwordController.text;
                   prefs.setStringSP('username', usernameController.text);
                   FirebaseAuth.instance.authStateChanges().listen((User? user) {
@@ -288,37 +297,100 @@ class CreateAccountState extends State<CreateAccount> {
   }
 }
 
-class FirstScreen extends StatelessWidget {
+class FirstScreen extends StatefulWidget {
   const FirstScreen({super.key});
+
+  @override
+  State<FirstScreen> createState() => FirstScreenState();
+}
+
+bool settings = false;
+
+class FirstScreenState extends State<FirstScreen> {
+  var tempSettings;
+  void refresh(rhaaSettings) async {
+    if (rhaaSettings == true) {
+      tempSettings = true;
+    } else if (rhaaSettings == false) {
+      tempSettings = false;
+    }
+    setState(() {});
+  }
+
+  dynamic tempState;
   @override
   Widget build(BuildContext context) {
-    var tempState;
+    print(settings);
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (authState == false) {
-        print("user got signed out");
-        tempState = false;
-      } else if (authState == true) {
-        print("user got signed in");
+      if (user != null) {
+        variables.pageData[37] = user.email.toString();
         tempState = true;
+      } else {
+        tempState = false;
       }
     });
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: MediaQuery.of(context).size.height * .10,
-        backgroundColor: Colors.purple,
-        leading: Container(),
-        title: const Text('Home'),
-      ),
-      body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-        if (tempState == true) {
-          return buildNormalHome(context);
-        } else if (tempState == false) {
-          return loginScreen(context);
-        }
-        return buildNormalHome(context);
-      }),
+      appBar: appBar(context, tempSettings),
+      body: layout(context, tempSettings),
     );
+  }
+
+  LayoutBuilder layout(context, tempSettings) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      if (tempSettings == true) {
+        return settingsPage(context);
+      } else if (tempState == true) {
+        return buildNormalHome(context);
+      } else if (tempState == false) {
+        return loginScreen(context);
+      }
+      return buildNormalHome(context);
+    });
+  }
+
+  AppBar appBar(context, tempSettings) {
+    if (tempSettings == true) {
+      return AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        leading: Container(),
+        actions: [
+          TextButton(
+            child: const Text("BACK",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                )),
+            onPressed: () {
+              settings = false;
+              refresh(settings);
+            },
+          ),
+        ],
+        title: const Text('Home'),
+      );
+    } else {
+      return AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        leading: Container(),
+        actions: [
+          TextButton(
+            child: const Text("SETTINGS",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                )),
+            onPressed: () {
+              settings = true;
+              refresh(settings);
+            },
+          ),
+        ],
+        title: const Text('Home'),
+      );
+    }
   }
 
   Widget loginScreen(context) {
@@ -363,15 +435,12 @@ class FirstScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomLeft,
-                  end: Alignment.topRight,
-                  colors: <Color>[
-                    Colors.black,
-                    Colors.purple,
-                  ],
+            child: Center(
+              child: Container(
+                margin: const EdgeInsets.all(50),
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/images/rohawktics_logo.png')),
                 ),
               ),
             ),
@@ -379,7 +448,7 @@ class FirstScreen extends StatelessWidget {
           Container(
             width: MediaQuery.of(context).size.width,
             height: (MediaQuery.of(context).size.height * .2),
-            color: Colors.black,
+            color: const Color.fromARGB(255, 123, 123, 123),
             child: TextButton(
               // Within the `FirstScreen` widget
               onPressed: () {
@@ -398,13 +467,19 @@ class FirstScreen extends StatelessWidget {
           Container(
             width: MediaQuery.of(context).size.width,
             height: (MediaQuery.of(context).size.height * .2),
-            color: Colors.red,
+            color: const Color.fromARGB(255, 61, 61, 144),
             child: TextButton(
               // Within the `FirstScreen` widget
-              onPressed: () {},
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => schedulePopup(context),
+                );
+              },
               child: Text(
                 'Schedule Page',
                 style: TextStyle(
+                  color: Colors.white,
                   fontSize: (textSize / 40),
                 ),
               ),
@@ -412,6 +487,120 @@ class FirstScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget schedulePopup(BuildContext context) {
+    return AlertDialog(
+        title: const Text('Sorry!'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const <Widget>[
+            Text("The Schedule Page is a feature still amidst development."),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text("Close"),
+          ),
+        ]);
+  }
+
+  Widget settingsPage(context) {
+    return Center(
+      child: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(50),
+          ),
+          TextButton(
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => logOut(context),
+                );
+              },
+              child: const Text("Sign Out")),
+          Container(
+            margin: const EdgeInsets.all(50),
+          ),
+          TextButton(
+            onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => resetPrefs(context),
+              );
+            },
+            child: const Text('Reset ALL Device Storage'),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget logOut(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Popup example'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const <Widget>[
+          Text("Are you sure?"),
+          Text('(Clicking yes logs you out)'),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Close'),
+        ),
+        TextButton(
+          child: const Text("Yes"),
+          onPressed: () async {
+            settings = false;
+            await FirebaseAuth.instance.signOut();
+            Navigator.of(context).pop();
+          },
+        )
+      ],
+    );
+  }
+
+  Widget resetPrefs(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Popup example'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const <Widget>[
+          Text("Are you sure?"),
+          Text('(Clicking yes deletes ALL your data)'),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Close'),
+        ),
+        TextButton(
+          child: const Text("Yes"),
+          onPressed: () async {
+            settings = false;
+            SharedPreferences preferences =
+                await SharedPreferences.getInstance();
+            await preferences.clear();
+            Navigator.of(context).pop();
+          },
+        )
+      ],
     );
   }
 }
@@ -430,6 +619,8 @@ class PrepScreenState extends State<PrepScreen> {
     var robotNumberController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
         title: const Text('MatchPrep'),
       ),
       body: Center(
@@ -468,10 +659,267 @@ class PrepScreenState extends State<PrepScreen> {
                   child: const Text('Start Scouting'),
                 ),
                 onPressed: () {
-                  variables.pageData[27] = matchNumberController.text;
-                  variables.pageData[28] = robotNumberController.text;
-                  Navigator.pushNamed(context, '/grid');
+                  variables.pageData[35] = matchNumberController.text;
+                  variables.pageData[36] = robotNumberController.text;
+                  Navigator.pushNamed(context, '/auto');
                 },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+const List<Widget> startingToggle = <Widget>[
+  Text('Left'),
+  Text('Center'),
+  Text('Right'),
+];
+
+const List<Widget> communityToggle = <Widget>[
+  Text("Didn't leave Community"),
+  Text('Did Leave Community'),
+];
+
+const List<Widget> dockingAuto = <Widget>[
+  Text('Docked'),
+  Text('Engaged'),
+];
+
+const List<Widget> scoringAuto = <Widget>[
+  Text('Neither'),
+  Text('Started W/ Cargo'),
+  Text('Scored Cargo'),
+];
+
+class Auto extends StatefulWidget {
+  const Auto({super.key});
+  @override
+  State<Auto> createState() => AutoState();
+}
+
+class AutoState extends State<Auto> {
+  final List<bool> selectedStart = <bool>[false, false, false];
+  final List<bool> selectedCommunity = <bool>[true, false];
+  final List<bool> selectedCharging = <bool>[false, false];
+
+  final List<bool> selectedScoring = <bool>[true, false, false];
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      if (MediaQuery.of(context).size.width < 600) {
+        return narrowScreen(context);
+      } else {
+        return wideScreen(context);
+      }
+    });
+  }
+
+  Scaffold narrowScreen(context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        title: const Text('Auto'),
+        actions: [
+          Container(),
+        ],
+      ),
+      body: Container(
+        alignment: Alignment.center,
+        child: Text('PLEASE TURN SCREEN HORIZONTAL'),
+      ),
+    );
+  }
+
+  Scaffold wideScreen(context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        title: const Text('Auto'),
+        actions: [
+          TextButton(
+            child: const Text(
+              'Next',
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+            onPressed: () {
+              if (selectedStart[0]) {
+                variables.pageData[27] = 'left';
+              } else if (selectedStart[1]) {
+                variables.pageData[27] = 'middle';
+              } else if (selectedStart[2]) {
+                variables.pageData[27] = 'right';
+              }
+              if (selectedCharging[1]) {
+                variables.pageData[28] = "Engaged";
+              } else if (selectedCharging[0]) {
+                variables.pageData[28] = "Docked";
+              } else {
+                variables.pageData[28] = "None";
+              }
+              if (selectedCommunity[0]) {
+                variables.pageData[29] = "Inside";
+              } else if (selectedCommunity[1]) {
+                variables.pageData[29] = "Left";
+              }
+              if (selectedScoring[2]) {
+                variables.pageData[30] = "Scored";
+              } else if (selectedScoring[1]) {
+                variables.pageData[30] = "Cargo";
+              } else if (selectedScoring[0]) {
+                variables.pageData[30] = "None";
+              }
+              Navigator.pushNamed(context, '/grid');
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: GridView.count(
+          primary: false,
+          padding: const EdgeInsets.all(20),
+          mainAxisSpacing: (MediaQuery.of(context).size.height / 40),
+          crossAxisCount: 2,
+          children: <Widget>[
+            Container(
+              height: MediaQuery.of(context).size.height / 2,
+              child: Column(children: <Widget>[
+                const Text(
+                  'Starting Position',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                ToggleButtons(
+                  onPressed: (int index) {
+                    setState(() {
+                      for (int i = 0; i < selectedStart.length; i++) {
+                        selectedStart[i] = i == index;
+                      }
+                    });
+                  },
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  selectedBorderColor: Colors.purple[700],
+                  selectedColor: Colors.white,
+                  fillColor: Colors.purple[200],
+                  color: Colors.black,
+                  constraints: const BoxConstraints(
+                    minHeight: 40.0,
+                    minWidth: 80.0,
+                  ),
+                  isSelected: selectedStart,
+                  children: startingToggle,
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                const Text(
+                  'Bot Leaving Community During Auto',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                ToggleButtons(
+                  onPressed: (int index) {
+                    setState(() {
+                      // The button that is tapped is set to true, and the others to false.
+                      for (int i = 0; i < selectedCommunity.length; i++) {
+                        selectedCommunity[i] = i == index;
+                      }
+                    });
+                  },
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  selectedBorderColor: Colors.purple[700],
+                  selectedColor: Colors.white,
+                  fillColor: Colors.purple[200],
+                  color: Colors.black,
+                  constraints: const BoxConstraints(
+                    minHeight: 40.0,
+                    minWidth: 200.0,
+                  ),
+                  isSelected: selectedCommunity,
+                  children: communityToggle,
+                ),
+              ]),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height / 2,
+              child: Column(
+                children: <Widget>[
+                  const Text(
+                    'Charging Station Auto',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                  ),
+                  ToggleButtons(
+                    onPressed: (int index) {
+                      setState(() {
+                        // The button that is tapped is set to true, and the others to false.
+
+                        selectedCharging[index] = !selectedCharging[index];
+                      });
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    selectedBorderColor: Colors.purple[700],
+                    selectedColor: Colors.white,
+                    fillColor: Colors.purple[200],
+                    constraints: const BoxConstraints(
+                      minHeight: 40.0,
+                      minWidth: 100.0,
+                    ),
+                    isSelected: selectedCharging,
+                    children: dockingAuto,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                  ),
+                  const Text(
+                    'Auto Scoring',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                  ),
+                  ToggleButtons(
+                    onPressed: (int index) {
+                      setState(() {
+                        // The button that is tapped is set to true, and the others to false.
+                        for (int i = 0; i < selectedScoring.length; i++) {
+                          selectedScoring[i] = i == index;
+                        }
+                      });
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    selectedBorderColor: Colors.purple[700],
+                    selectedColor: Colors.white,
+                    fillColor: Colors.purple[200],
+                    constraints: const BoxConstraints(
+                      minHeight: 40.0,
+                      minWidth: 130.0,
+                    ),
+                    isSelected: selectedScoring,
+                    children: scoringAuto,
+                  ),
+                ],
               ),
             ),
           ],
@@ -503,7 +951,8 @@ class SecondScreenState extends State<SecondScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.purple,
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
         leading: TextButton(
           child: const Text(
             'Back',
@@ -524,27 +973,15 @@ class SecondScreenState extends State<SecondScreen> {
             ),
             // Within the `FirstScreen` widget
             onPressed: () {
-              prefs.setPageDataSP(
-                  variables.pageData[27], variables.pageData[28]);
-              prefs.setFirebasePush();
-              Future.delayed(const Duration(milliseconds: 300), () {
-                pushToFirebase();
-              }); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
-              var times = 0;
-              while (times < 10) {
-                print("looping while loop");
-                Future.delayed(const Duration(milliseconds: 1000), () {
-                  print("this is not running");
-                  if (firebasePushVar == 1) {
-                    resetAllData();
-                    times = 11;
-                  }
-                });
-
-                times = times + 1;
-              }
+              // prefs.setFirebasePush();
+              // Future.delayed(const Duration(milliseconds: 300), () {
+              //   pushToFirebase();
+              // }); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
+              // Future.delayed(const Duration(milliseconds: 400), () {
+              //   resetAllData();
+              // });
               buttonPressed();
-              Navigator.pop(context);
+              Navigator.pushNamed(context, '/endgame');
             },
           )
         ],
@@ -562,45 +999,9 @@ class SecondScreenState extends State<SecondScreen> {
   }
 
   Widget _buildNormalContainer() {
-    return Center(
-      child: Container(
-        decoration: const BoxDecoration(color: Colors.red),
-        child: const Text("Please Turn Horizontal"),
-      ),
-
-      // Center is a layout widget. It takes a single child and positions it
-      // in the middle of the parent.
-      //   child: Column(
-      //     // Column is also a layout widget. It takes a list of children and
-      //     // arranges them vertically. By default, it sizes itself to fit its
-      //     // children horizontally, and tries to be as tall as its parent.
-      //     //
-      //     // Invoke "debug painting" (press "p" in the console, choose the
-      //     // "Toggle Debug Paint" action from the Flutter Inspector in Android
-      //     // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-      //     // to see the wireframe for each widget.
-      //     //
-      //     // Column has various properties to control how it sizes itself and
-      //     // how it positions its children. Here we use mainAxisAlignment to
-      //     // center the children vertically; the main axis here is the vertical
-      //     // axis because Columns are vertical (the cross axis would be
-      //     // horizontal).
-      //     mainAxisAlignment: MainAxisAlignment.center,
-      //     children: <Widget>[
-      //       const Text(
-      //         'You have clicked the button this many times:',
-      //       ),
-      //       Text(
-      //         '$_counter',
-      //         style: Theme.of(context).textTheme.headline4,
-      //       ),
-      //     ],
-      //   ),
-      // ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.add), // Ths trailing comma makes auto-formatting nicer for build methods.
+    return Container(
+      alignment: Alignment.center,
+      child: Text('PLEASE TURN SCREEN HORIZONTAL'),
     );
   }
 
@@ -1077,6 +1478,278 @@ class SecondScreenState extends State<SecondScreen> {
   }
 }
 
+const List<Widget> chargeToggle = <Widget>[
+  Text('Enter Left'),
+  Text('Docked'),
+  Text('Engaged'),
+  Text('Enter Right'),
+];
+
+const List<Widget> endgameToggle = <Widget>[
+  Text('Outside Community'),
+  Text('Inside Community'),
+];
+
+const List<Widget> chargingNumber = <Widget>[
+  Text('0'),
+  Text('1'),
+  Text('2'),
+  Text('3'),
+];
+
+class Endgame extends StatefulWidget {
+  const Endgame({super.key});
+  @override
+  State<Endgame> createState() => EndgameState();
+}
+
+class EndgameState extends State<Endgame> {
+  final List<bool> selectedCharge = <bool>[false, false, false, false];
+  final List<bool> selectedEndgame = <bool>[true, false];
+  final List<bool> selectedChargeNum = <bool>[true, false, false, false];
+
+  final notesController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.of(context).size.width < 600) {
+      return narrowScreen(context);
+    } else {
+      return wideScreen(context);
+    }
+  }
+
+  Scaffold narrowScreen(context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        title: const Text('Endgame'),
+        actions: [
+          Container(),
+        ],
+      ),
+      body: Container(
+        alignment: Alignment.center,
+        child: Text('PLEASE TURN SCREEN HORIZONTAL'),
+      ),
+    );
+  }
+
+  Scaffold wideScreen(context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        title: const Text('Endgame'),
+        actions: [
+          TextButton(
+            child: const Text(
+              'Done',
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+            onPressed: () {
+              if (selectedCharge[0] && selectedCharge[2]) {
+                variables.pageData[31] = 'left+engaged';
+                //entered from left and docked
+              } else if (selectedCharge[0] && selectedCharge[1]) {
+                variables.pageData[31] = 'left+docked';
+                //entered from left and engaged
+              } else if (selectedCharge[0]) {
+                variables.pageData[31] = 'left+failed';
+                //entered from left and failed
+              } else if (selectedCharge[3] && selectedCharge[2]) {
+                variables.pageData[31] = 'right+engaged';
+                //entered from right and docked
+              } else if (selectedCharge[3] && selectedCharge[1]) {
+                variables.pageData[31] = 'right+docked';
+                //entered from right and docked
+              } else if (selectedCharge[3]) {
+                variables.pageData[31] = 'right+failed';
+                //entered from right and failed
+              } else if (selectedCharge[0] ||
+                  selectedCharge[1] ||
+                  selectedCharge[2] ||
+                  selectedCharge[3]) {
+                variables.pageData[31] = 'scouterError';
+                //error on the scouters end
+              } else {
+                variables.pageData[31] = 'noCharging';
+                //did not interact with charging station
+              }
+
+              if (selectedChargeNum[0]) {
+                variables.pageData[32] = '0';
+              } else if (selectedChargeNum[1]) {
+                variables.pageData[32] = '1';
+              } else if (selectedChargeNum[2]) {
+                variables.pageData[32] = '2';
+              } else if (selectedChargeNum[3]) {
+                variables.pageData[32] = '3';
+              }
+
+              if (selectedEndgame[1]) {
+                variables.pageData[33] = 'inside';
+              } else {
+                variables.pageData[33] = 'outside';
+              }
+              variables.pageData[34] = notesController.text;
+              prefs.setPageDataSP(
+                  variables.pageData[35], variables.pageData[36]);
+              prefs.setFirebasePush();
+              Future.delayed(const Duration(milliseconds: 250), () {
+                pushToFirebase();
+              }); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
+              Future.delayed(const Duration(milliseconds: 500), () {
+                resetAllData();
+              });
+              Navigator.popAndPushNamed(context, '/');
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: GridView.count(
+          primary: false,
+          padding: const EdgeInsets.all(20),
+          mainAxisSpacing: (MediaQuery.of(context).size.height / 40),
+          crossAxisCount: 2,
+          children: <Widget>[
+            Container(
+              height: MediaQuery.of(context).size.height / 2,
+              child: Column(children: <Widget>[
+                const Text(
+                  'ChargingStation',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(20),
+                ),
+                ToggleButtons(
+                  onPressed: (int index) {
+                    setState(() {
+                      selectedCharge[index] = !selectedCharge[index];
+                      print(selectedCharge);
+                    });
+                  },
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  selectedBorderColor: Colors.purple[700],
+                  selectedColor: Colors.white,
+                  fillColor: Colors.purple[200],
+                  color: Colors.black,
+                  constraints: const BoxConstraints(
+                    minHeight: 40.0,
+                    minWidth: 80.0,
+                  ),
+                  isSelected: selectedCharge,
+                  children: chargeToggle,
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                const Text(
+                  'Bots on Charging Station',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                ToggleButtons(
+                  onPressed: (int index) {
+                    setState(() {
+                      // The button that is tapped is set to true, and the others to false.
+                      for (int i = 0; i < selectedChargeNum.length; i++) {
+                        selectedChargeNum[i] = i == index;
+                      }
+                    });
+                  },
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  selectedBorderColor: Colors.purple[700],
+                  selectedColor: Colors.white,
+                  fillColor: Colors.purple[200],
+                  color: Colors.black,
+                  constraints: const BoxConstraints(
+                    minHeight: 40.0,
+                    minWidth: 80.0,
+                  ),
+                  isSelected: selectedChargeNum,
+                  children: chargingNumber,
+                ),
+              ]),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height / 2,
+              child: Column(
+                children: <Widget>[
+                  const Text(
+                    'Finishing the Match',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                  ),
+                  ToggleButtons(
+                    onPressed: (int index) {
+                      setState(() {
+                        // The button that is tapped is set to true, and the others to false.
+                        for (int i = 0; i < selectedEndgame.length; i++) {
+                          selectedEndgame[i] = i == index;
+                        }
+                      });
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    selectedBorderColor: Colors.purple[700],
+                    selectedColor: Colors.white,
+                    fillColor: Colors.purple[200],
+                    constraints: const BoxConstraints(
+                      minHeight: 40.0,
+                      minWidth: 180.0,
+                    ),
+                    isSelected: selectedEndgame,
+                    children: endgameToggle,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                  ),
+                  const Text(
+                    'Match Notes',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(75, 0, 75, 0),
+                    decoration: BoxDecoration(color: Colors.grey[200]),
+                    child: TextField(
+                      minLines: 2,
+                      maxLines: 4,
+                      controller: notesController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'NOTES',
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 dynamic pageDataIndexToRobotNum(robotNum) async {
   variables.pageData[28] = robotNum.toString();
 }
@@ -1085,7 +1758,6 @@ dynamic pageDataIndexToMatchNum(matchNum) async {
   variables.pageData[27] = matchNum.toString();
 }
 
-var firebasePushVar = 0;
 dynamic pushToFirebase() {
   var index = 0;
   var jndex = 0;
@@ -1104,7 +1776,6 @@ dynamic pushToFirebase() {
       }
     }
   }
-  firebasePushVar = 1;
   // try {
   //   final prefs = await SharedPreferences.getInstance();
   //   FirebaseDatabase database = FirebaseDatabase.instance;
@@ -1173,7 +1844,7 @@ dynamic createAccount(emailAddress, password) async {
 // }
 
 dynamic resetAllData() async {
-  firebasePushVar = 0;
+  final prefs = await SharedPreferences.getInstance();
 
   variables.buttonOneImage = variables.rodAlone;
   variables.buttonOneState = false;
@@ -1257,35 +1928,44 @@ dynamic resetAllData() async {
   variables.button27State = false;
 
   variables.pageData = [
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    '0',
-    'MatchNum',
-    'RobotNum',
+    '0', //[0]
+    '0', //[1]
+    '0', //[2]
+    '0', //[3]
+    '0', //[4]
+    '0', //[5]
+    '0', //[6]
+    '0', //[7]
+    '0', //[8]
+    '0', //[9]
+    '0', //[10]
+    '0', //[11]
+    '0', //[12]
+    '0', //[13]
+    '0', //[14]
+    '0', //[15]
+    '0', //[16]
+    '0', //[17]
+    '0', //[18]
+    '0', //[19]
+    '0', //[20]
+    '0', //[21]
+    '0', //[22]
+    '0', //[23]
+    '0', //[24]
+    '0', //[25]
+    '0', //[26]
+    'StartingPosition', //[27]
+    'ChargingStationAuto', //[28]
+    'Community', //[29]
+    'AutoScoring', //[30]
+    'ChargingStationEndgame', //[31]
+    'BotsOnChargingStation', //[32]
+    'InsideOrOutsideCommunity', //[33]
+    'Notes', //[34]
+    'MatchNum', //[35]
+    'RobotNum', //[36]
+    prefs.getString('username').toString(), //[37]
   ];
 }
 
