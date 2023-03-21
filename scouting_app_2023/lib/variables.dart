@@ -92,6 +92,8 @@ var button27State = false;
 
 var firebasePush = {};
 
+var firebasePitPush = {};
+
 List<String> pageData = [
   '0', //[0]
   '0', //[1]
@@ -131,6 +133,17 @@ List<String> pageData = [
   'MatchNum', //[35]
   'RobotNum', //[36]
   'noUserSaved', //[37]
+];
+
+List<String> pitData = [
+  'Drive Train', //0
+  'Width', //1
+  'Height', //2
+  'Weight', //3
+  'Cones/Cubes/Both/Neither', //4
+  'How high?', //5
+  'AutoBalance Auto?', //6
+  'Team Friendliness', //7
 ];
 
 var testVar = false;

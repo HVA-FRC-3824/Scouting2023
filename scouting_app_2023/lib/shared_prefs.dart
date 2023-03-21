@@ -1,13 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:scouting_app_2023/variables.dart' as variables;
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 void setPageDataSP(matchNumber, robotNumber) async {
-  print("loopinghere1");
   final prefs = await SharedPreferences.getInstance();
   prefs.setStringList(
     matchNumber.toString() + '/' + robotNumber.toString() + '/pageData',
@@ -15,8 +10,32 @@ void setPageDataSP(matchNumber, robotNumber) async {
   );
 }
 
+void setPitScoutSP(robotNumber) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setStringList(robotNumber.toString() + 'pitData', variables.pitData);
+}
+
+void setCodeToSP(secretCode) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('Secret_Code', secretCode);
+}
+
+void setPitScoutFB() async {
+  print('Pit Scout saved to sp initially');
+  final prefs = await SharedPreferences.getInstance();
+  var bot = 0;
+  for (var j = bot; j < 9999; j++) {
+    if (prefs.containsKey(j.toString() + 'pitData')) {
+      print('This idea ran');
+      variables
+          .firebasePitPush[(prefs.getString('Secret_Code'))! + j.toString()] = {
+        prefs.getStringList(j.toString() + 'pitData')
+      };
+    }
+  }
+}
+
 void setStringSP(stringNameinSP, stringValue) async {
-  print('loopinghere2');
   final prefs = await SharedPreferences.getInstance();
   prefs.setString(stringNameinSP, stringValue);
 }
@@ -24,25 +43,19 @@ void setStringSP(stringNameinSP, stringValue) async {
 var run = 0;
 
 void setFirebasePush() async {
-  print('this is running');
   final prefs = await SharedPreferences.getInstance();
   var match = 0; //matchNumber
   var bot = 0; //robotNumber
-  var username;
-  print(prefs);
-  print('this is running2222');
+  String username;
   try {
     if (prefs.containsKey('username')) {
-      username = prefs.getString('username');
+      username = prefs.getString('username').toString();
       variables.firebasePush['username'] = username;
     }
-  } on Error {
-    print('usernameToFBerror');
-  }
+  } on Error {}
   for (var i = match; i < 150; i++) {
     for (var j = bot; j < 9999; j++) {
       if (prefs.containsKey(i.toString() + '/' + j.toString() + '/pageData')) {
-        print("weran");
         var temp = {
           'pageData': (prefs
               .getStringList(i.toString() + '/' + j.toString() + '/pageData'))

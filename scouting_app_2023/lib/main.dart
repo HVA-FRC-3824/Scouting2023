@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_app_2023/variables.dart' as variables;
 import 'package:firebase_core/firebase_core.dart';
@@ -6,10 +5,11 @@ import 'firebase_options.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:scouting_app_2023/sharedPrefs.dart' as prefs;
+import 'package:scouting_app_2023/shared_prefs.dart' as prefs;
+import 'package:scouting_app_2023/analytics.dart' as analytics;
 
 bool authState = false;
-
+String errorMessage = 'noError';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -20,7 +20,7 @@ void main() async {
       title: 'Named Routes Demo',
       // Start the app with the "/" named route. In this case, the app starts
       // on the FirstScreen widget.
-      initialRoute: '/auto',
+      initialRoute: '/',
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => const FirstScreen(),
@@ -36,11 +36,16 @@ void main() async {
         '/endgame': (context) => const Endgame(),
 
         '/auto': (context) => const Auto(),
+
+        '/pitPrep': (context) => const PitPrep(),
+
+        '/pit': (context) => const Pit(),
       },
     ),
   );
 
   prefs.setFirebasePush();
+  //analytics.returnRobotJson(3824);
 //AUTHENTICATION
   WidgetsFlutterBinding.ensureInitialized();
   if (3 != 3) {
@@ -80,6 +85,11 @@ class GeneralSigninState extends State<GeneralSignin> {
   // of the TextField.
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final loginText = "Login";
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+  }
 
   @override
   void dispose() {
@@ -138,39 +148,44 @@ class GeneralSigninState extends State<GeneralSignin> {
                   variables.pageData[37] = usernameController.text;
                   variables.password = passwordController.text;
                   prefs.setStringSP('username', usernameController.text);
-                  signIntoAccount(
-                      usernameController.text, passwordController.text);
+                  signIntoAccount(context, usernameController.text,
+                      passwordController.text);
+                  Future.delayed(const Duration(milliseconds: 200), () {
+                    if (errorMessage != 'noError') {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) =>
+                            _buildPopupDialog(context),
+                      );
+                    }
+                  });
                   FirebaseAuth.instance.authStateChanges().listen((User? user) {
                     if (user == null) {
-                      print('User is currently signed out!');
                       authState = false;
                     } else {
                       authState = true;
 
                       Navigator.pushNamed(context, '/');
-                      print('User is signed in!');
                     }
                   });
                 },
               ),
             ),
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.all(MediaQuery.of(context).size.height / 30),
-                child: TextButton(
-                  style: const ButtonStyle(
-                    backgroundColor:
-                        MaterialStatePropertyAll<Color>(Colors.grey),
-                  ),
-                  child: Container(
-                    margin:
-                        EdgeInsets.all(MediaQuery.of(context).size.height / 50),
-                    child: const Text('Create Acc?'),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/create');
-                  },
+            Container(
+              constraints: const BoxConstraints(maxHeight: 300),
+              margin: EdgeInsets.all(MediaQuery.of(context).size.height / 30),
+              child: TextButton(
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll<Color>(Colors.grey),
                 ),
+                child: Container(
+                  margin:
+                      EdgeInsets.all(MediaQuery.of(context).size.height / 50),
+                  child: const Text('Create Acc?'),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/create');
+                },
               ),
             ),
           ],
@@ -178,6 +193,43 @@ class GeneralSigninState extends State<GeneralSignin> {
       ),
     );
   }
+
+  dynamic signIntoAccount(context, emailAddress, password) async {
+    try {
+      final credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: emailAddress, password: password);
+    } on FirebaseAuthException catch (e) {
+      print(e.code);
+      if (e.code == 'user-not-found') {
+        errorMessage = e.code;
+      } else if (e.code == 'wrong-password') {
+        errorMessage = e.code;
+      } else {
+        errorMessage = 'noError';
+      }
+    }
+  }
+}
+
+Widget _buildPopupDialog(context) {
+  return AlertDialog(
+    title: const Text('Login Error'),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(errorMessage),
+      ],
+    ),
+    actions: <Widget>[
+      TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: const Text('Close'),
+      ),
+    ],
+  );
 }
 
 class CreateAccount extends StatefulWidget {
@@ -247,11 +299,21 @@ class CreateAccountState extends State<CreateAccount> {
                 ),
                 onPressed: () async {
                   createAccount(
+                    context,
                     usernameController.text,
                     passwordController.text,
                   );
-                  signIntoAccount(
-                      usernameController.text, passwordController.text);
+                  signIntoAccount(context, usernameController.text,
+                      passwordController.text);
+                  Future.delayed(const Duration(milliseconds: 200), () {
+                    if (errorMessage != 'noError') {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) =>
+                            _buildPopupDialog(context),
+                      );
+                    }
+                  });
                   //authState = true;
                   //Navigator.pushNamed(context, '/');
                   variables.pageData[37] = usernameController.text;
@@ -259,40 +321,90 @@ class CreateAccountState extends State<CreateAccount> {
                   prefs.setStringSP('username', usernameController.text);
                   FirebaseAuth.instance.authStateChanges().listen((User? user) {
                     if (user == null) {
-                      print('User is currently signed out!');
                       authState = false;
                     } else {
                       authState = true;
 
                       Navigator.pushNamed(context, '/');
-                      print('User is signed in!');
                     }
                   });
                 },
               ),
             ),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(20),
-                child: TextButton(
-                  style: const ButtonStyle(
-                    backgroundColor:
-                        MaterialStatePropertyAll<Color>(Colors.grey),
-                  ),
-                  child: Container(
-                    margin:
-                        EdgeInsets.all(MediaQuery.of(context).size.height / 50),
-                    child: const Text('Sign In?'),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/signin');
-                  },
+            Container(
+              constraints: const BoxConstraints(maxHeight: 300),
+              margin: EdgeInsets.all(MediaQuery.of(context).size.height / 30),
+              child: TextButton(
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll<Color>(Colors.grey),
                 ),
+                child: Container(
+                  margin:
+                      EdgeInsets.all(MediaQuery.of(context).size.height / 50),
+                  child: const Text('Sign in?'),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/signin');
+                },
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  dynamic createAccount(context, emailAddress, password) async {
+    try {
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailAddress.toString(),
+        password: password.toString(),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        errorMessage = e.code;
+      } else if (e.code == 'email-already-in-use') {
+        errorMessage = e.code;
+      } else {
+        errorMessage = "noError";
+      }
+    } catch (e) {}
+  }
+
+  dynamic signIntoAccount(context, emailAddress, password) async {
+    try {
+      final credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: emailAddress, password: password);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        errorMessage = e.code;
+      } else if (e.code == 'wrong-password') {
+        errorMessage = e.code;
+      } else {
+        errorMessage = 'noError';
+      }
+    }
+  }
+
+  Widget _buildPopupDialog(context) {
+    return AlertDialog(
+      title: const Text('Login Error'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(errorMessage),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Close'),
+        ),
+      ],
     );
   }
 }
@@ -307,7 +419,7 @@ class FirstScreen extends StatefulWidget {
 bool settings = false;
 
 class FirstScreenState extends State<FirstScreen> {
-  var tempSettings;
+  bool tempSettings = false;
   void refresh(rhaaSettings) async {
     if (rhaaSettings == true) {
       tempSettings = true;
@@ -320,7 +432,6 @@ class FirstScreenState extends State<FirstScreen> {
   dynamic tempState;
   @override
   Widget build(BuildContext context) {
-    print(settings);
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         variables.pageData[37] = user.email.toString();
@@ -394,10 +505,6 @@ class FirstScreenState extends State<FirstScreen> {
   }
 
   Widget loginScreen(context) {
-    var textSize = ((MediaQuery.of(context).size.height / 2) *
-            (MediaQuery.of(context).size.width) /
-            5) /
-        40;
     return Center(
       child: Column(
         children: [
@@ -441,6 +548,25 @@ class FirstScreenState extends State<FirstScreen> {
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                       image: AssetImage('assets/images/rohawktics_logo.png')),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: (MediaQuery.of(context).size.height * .08),
+            color: const Color.fromARGB(255, 255, 0, 0),
+            child: TextButton(
+              // Within the `FirstScreen` widget
+              onPressed: () {
+                // Navigate to the second screen using a named route.
+                Navigator.pushNamed(context, '/pitPrep');
+              },
+              child: Text(
+                'Pit Scouting Page',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: (textSize / 80),
                 ),
               ),
             ),
@@ -730,7 +856,7 @@ class AutoState extends State<Auto> {
       ),
       body: Container(
         alignment: Alignment.center,
-        child: Text('PLEASE TURN SCREEN HORIZONTAL'),
+        child: const Text('PLEASE TURN SCREEN HORIZONTAL'),
       ),
     );
   }
@@ -1001,7 +1127,7 @@ class SecondScreenState extends State<SecondScreen> {
   Widget _buildNormalContainer() {
     return Container(
       alignment: Alignment.center,
-      child: Text('PLEASE TURN SCREEN HORIZONTAL'),
+      child: const Text('PLEASE TURN SCREEN HORIZONTAL'),
     );
   }
 
@@ -1530,7 +1656,7 @@ class EndgameState extends State<Endgame> {
       ),
       body: Container(
         alignment: Alignment.center,
-        child: Text('PLEASE TURN SCREEN HORIZONTAL'),
+        child: const Text('PLEASE TURN SCREEN HORIZONTAL'),
       ),
     );
   }
@@ -1599,7 +1725,11 @@ class EndgameState extends State<Endgame> {
                   variables.pageData[35], variables.pageData[36]);
               prefs.setFirebasePush();
               Future.delayed(const Duration(milliseconds: 250), () {
-                pushToFirebase();
+                try {
+                  pushToFirebase();
+                } on Error {
+                  print("No Network");
+                }
               }); //THIS IS A PUSH TO FIREBASE THAT WORKS YOU JUST HAVE TO DO IT ON LIVE SERVERS
               Future.delayed(const Duration(milliseconds: 500), () {
                 resetAllData();
@@ -1626,13 +1756,12 @@ class EndgameState extends State<Endgame> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.all(20),
+                  margin: const EdgeInsets.all(20),
                 ),
                 ToggleButtons(
                   onPressed: (int index) {
                     setState(() {
                       selectedCharge[index] = !selectedCharge[index];
-                      print(selectedCharge);
                     });
                   },
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -1750,12 +1879,633 @@ class EndgameState extends State<Endgame> {
   }
 }
 
+class PitPrep extends StatefulWidget {
+  const PitPrep({super.key});
+  @override
+  State<PitPrep> createState() => PitPrepState();
+}
+
+class PitPrepState extends State<PitPrep> {
+  final secretController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        title: const Text('Pit Prep'),
+        actions: [
+          Container(),
+        ],
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            'Pit Scouting Code',
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(20),
+          ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(75, 0, 75, 0),
+            decoration: BoxDecoration(color: Colors.grey[200]),
+            child: TextField(
+              minLines: 1,
+              maxLines: 1,
+              controller: secretController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Secret Code!!',
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(20),
+          ),
+          Container(
+            decoration:
+                const BoxDecoration(color: Color.fromARGB(255, 75, 156, 211)),
+            child: TextButton(
+              child: const Text(
+                'Move on to Pit Scouting',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                prefs.setCodeToSP(secretController.text);
+                Navigator.pushNamed(context, '/pit');
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+const List<Widget> driveTrainToggle = <Widget>[
+  Text('West Coast'),
+  Text('Swerve'),
+  Text('Tank'),
+  Text('Mecanum'),
+];
+
+const List<Widget> cargoToggle = <Widget>[
+  Text('None'),
+  Text('Cube'),
+  Text('Cone'),
+  Text('Both'),
+];
+
+const List<Widget> heightToggle = <Widget>[
+  Text('None'),
+  Text('Bottom'),
+  Text('Middle'),
+  Text('Top'),
+];
+
+const List<Widget> balanceToggle = <Widget>[
+  Text('No'),
+  Text('Yes'),
+];
+
+class Pit extends StatefulWidget {
+  const Pit({super.key});
+  @override
+  State<Pit> createState() => PitState();
+}
+
+const List<String> widthPit = <String>[
+  '15',
+  '16',
+  '17',
+  '18',
+  '19',
+  '20',
+  '21',
+  '22',
+  '23',
+  '24',
+  '25',
+  '26',
+  '27',
+  '28',
+  '29',
+  '30',
+  '31',
+  '32',
+  '33',
+  '34',
+  '35',
+  '36',
+  '37',
+  '38',
+  '39',
+  '40',
+];
+
+const List<String> heightPit = <String>[
+  '20',
+  '21',
+  '22',
+  '23',
+  '24',
+  '25',
+  '26',
+  '27',
+  '28',
+  '29',
+  '30',
+  '31',
+  '32',
+  '33',
+  '34',
+  '35',
+  '36',
+  '37',
+  '38',
+  '39',
+  '40',
+  '41',
+  '42',
+  '43',
+  '44',
+  '45',
+  '46',
+  '47',
+  '48',
+  '49',
+  '50',
+  '51',
+  '52',
+  '53',
+  '54',
+  '55',
+  '56',
+  '57',
+  '58',
+  '59',
+  '60',
+];
+
+const List<String> weightPit = <String>[
+  '80',
+  '81',
+  '82',
+  '83',
+  '84',
+  '85',
+  '86',
+  '87',
+  '88',
+  '89',
+  '90',
+  '91',
+  '92',
+  '93',
+  '94',
+  '95',
+  '96',
+  '97',
+  '98',
+  '99',
+  '100',
+  '101',
+  '102',
+  '103',
+  '104',
+  '105',
+  '106',
+  '107',
+  '108',
+  '109',
+  '110',
+  '111',
+  '112',
+  '113',
+  '114',
+  '115',
+  '116',
+  '117',
+  '118',
+  '119',
+  '120',
+  '121',
+  '122',
+  '123',
+  '124',
+  '125',
+];
+
+class PitState extends State<Pit> {
+  final List<bool> selectedDT = <bool>[true, false, false, false];
+  final List<bool> selectedCargo = <bool>[true, false, false, false];
+  final List<bool> selectedNodeHeight = <bool>[true, false, false, false];
+  final List<bool> selectedBalance = <bool>[true, false];
+  final numberController = TextEditingController();
+  final notesController = TextEditingController();
+  String dropdownValue = widthPit.first;
+  String dropdown2Value = heightPit.first;
+  String dropdown3Value = weightPit.first;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        title: const Text('Pit Scouting'),
+        actions: [
+          Container(),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'Robot Number',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Container(
+              margin: const EdgeInsets.fromLTRB(75, 0, 75, 0),
+              decoration: BoxDecoration(color: Colors.grey[200]),
+              child: TextField(
+                minLines: 1,
+                maxLines: 1,
+                controller: numberController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Robot Number',
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'Drive Train',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            ToggleButtons(
+              onPressed: (int index) {
+                setState(() {
+                  for (int i = 0; i < selectedDT.length; i++) {
+                    selectedDT[i] = i == index;
+                  }
+                });
+              },
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              selectedBorderColor: Colors.purple[700],
+              selectedColor: Colors.white,
+              fillColor: Colors.purple[200],
+              color: Colors.black,
+              constraints: const BoxConstraints(
+                minHeight: 40.0,
+                minWidth: 80.0,
+              ),
+              isSelected: selectedDT,
+              children: driveTrainToggle,
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'Robot Dimensions',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  children: [
+                    const Text('Width'),
+                    DropdownButton<String>(
+                      value: dropdownValue,
+                      icon: const Icon(Icons.arrow_downward),
+                      elevation: 16,
+                      style: const TextStyle(color: Colors.deepPurple),
+                      underline: Container(
+                        height: 2,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      onChanged: (String? value) {
+                        // This is called when the user selects an item.
+                        setState(() {
+                          dropdownValue = value!;
+                        });
+                      },
+                      items: widthPit
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                Column(
+                  children: [
+                    Text('Height'),
+                    DropdownButton<String>(
+                      value: dropdown2Value,
+                      icon: const Icon(Icons.arrow_downward),
+                      elevation: 16,
+                      style: const TextStyle(color: Colors.deepPurple),
+                      underline: Container(
+                        height: 2,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      onChanged: (String? value) {
+                        // This is called when the user selects an item.
+                        setState(() {
+                          dropdown2Value = value!;
+                        });
+                      },
+                      items: heightPit
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                Column(
+                  children: [
+                    Text('Weight'),
+                    DropdownButton<String>(
+                      value: dropdown3Value,
+                      icon: const Icon(Icons.arrow_downward),
+                      elevation: 16,
+                      style: const TextStyle(color: Colors.deepPurple),
+                      underline: Container(
+                        height: 2,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      onChanged: (String? value) {
+                        // This is called when the user selects an item.
+                        setState(() {
+                          dropdown3Value = value!;
+                        });
+                      },
+                      items: weightPit
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'Cones, Cubes, or something in between',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            ToggleButtons(
+              onPressed: (int index) {
+                setState(() {
+                  for (int i = 0; i < selectedCargo.length; i++) {
+                    selectedCargo[i] = i == index;
+                  }
+                });
+              },
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              selectedBorderColor: Colors.purple[700],
+              selectedColor: Colors.white,
+              fillColor: Colors.purple[200],
+              color: Colors.black,
+              constraints: const BoxConstraints(
+                minHeight: 40.0,
+                minWidth: 80.0,
+              ),
+              isSelected: selectedCargo,
+              children: cargoToggle,
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'How HIGH can you go?',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            ToggleButtons(
+              onPressed: (int index) {
+                setState(() {
+                  for (int i = 0; i < selectedNodeHeight.length; i++) {
+                    selectedNodeHeight[i] = i == index;
+                  }
+                });
+              },
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              selectedBorderColor: Colors.purple[700],
+              selectedColor: Colors.white,
+              fillColor: Colors.purple[200],
+              color: Colors.black,
+              constraints: const BoxConstraints(
+                minHeight: 40.0,
+                minWidth: 80.0,
+              ),
+              isSelected: selectedNodeHeight,
+              children: heightToggle,
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'Auto Balance?(Auto)',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            ToggleButtons(
+              onPressed: (int index) {
+                setState(() {
+                  for (int i = 0; i < selectedBalance.length; i++) {
+                    selectedBalance[i] = i == index;
+                  }
+                });
+              },
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              selectedBorderColor: Colors.purple[700],
+              selectedColor: Colors.white,
+              fillColor: Colors.purple[200],
+              color: Colors.black,
+              constraints: const BoxConstraints(
+                minHeight: 40.0,
+                minWidth: 80.0,
+              ),
+              isSelected: selectedBalance,
+              children: balanceToggle,
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'Team Freindliness and/or Notes',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Container(
+              margin: const EdgeInsets.fromLTRB(75, 0, 75, 0),
+              decoration: BoxDecoration(color: Colors.grey[200]),
+              child: TextField(
+                minLines: 1,
+                maxLines: 5,
+                controller: notesController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Anything Extra Here',
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Container(
+              constraints: const BoxConstraints(
+                minWidth: 100,
+              ),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 75, 156, 211),
+              ),
+              child: TextButton(
+                child: const Text(
+                  'Done',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () {
+                  if (selectedDT[0]) {
+                    variables.pitData[0] = 'West Coast';
+                  } else if (selectedDT[1]) {
+                    variables.pitData[0] = 'Swerve';
+                  } else if (selectedDT[2]) {
+                    variables.pitData[0] = 'Tank';
+                  } else if (selectedDT[3]) {
+                    variables.pitData[0] = 'Mecanum';
+                  }
+                  variables.pitData[1] = dropdownValue;
+                  variables.pitData[2] = dropdown2Value;
+                  variables.pitData[3] = dropdown3Value;
+                  if (selectedCargo[0]) {
+                    variables.pitData[4] = 'None';
+                  } else if (selectedCargo[1]) {
+                    variables.pitData[4] = 'Cubes';
+                  } else if (selectedCargo[2]) {
+                    variables.pitData[4] = 'Cones';
+                  } else if (selectedCargo[3]) {
+                    variables.pitData[4] = 'Both';
+                  }
+                  if (selectedNodeHeight[0]) {
+                    variables.pitData[5] = 'None';
+                  } else if (selectedNodeHeight[1]) {
+                    variables.pitData[5] = 'Bottom';
+                  } else if (selectedNodeHeight[2]) {
+                    variables.pitData[5] = 'Middle';
+                  } else if (selectedNodeHeight[3]) {
+                    variables.pitData[5] = 'Top';
+                  }
+                  if (selectedBalance[0]) {
+                    variables.pitData[6] = 'No';
+                  } else if (selectedBalance[1]) {
+                    variables.pitData[6] = 'Yes';
+                  }
+                  variables.pitData[7] = notesController.text;
+                  prefs.setPitScoutSP(numberController.text);
+                  prefs.setPitScoutFB();
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    pitToFirebase();
+                    print('firebasePushFinished');
+                  });
+                },
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 dynamic pageDataIndexToRobotNum(robotNum) async {
   variables.pageData[28] = robotNum.toString();
 }
 
 dynamic pageDataIndexToMatchNum(matchNum) async {
   variables.pageData[27] = matchNum.toString();
+}
+
+dynamic pitToFirebase() {
+  print(variables.firebasePitPush);
+  for (var j = 0; j < 9999; j++) {
+    try {
+      if (variables.firebasePitPush.containsKey('1492' + j.toString())) {
+        print('made it to here');
+        DatabaseReference ref = FirebaseDatabase.instance
+            .ref('SMR2023/' + j.toString() + '/pitData/');
+        ref.set({variables.firebasePitPush['1492' + j.toString()]});
+      }
+    } on Error {}
+  }
 }
 
 dynamic pushToFirebase() {
@@ -1765,12 +2515,13 @@ dynamic pushToFirebase() {
     if (variables.firebasePush.containsKey(i.toString())) {
       for (var j = jndex; j < 9999; j++) {
         if (variables.firebasePush[i.toString()].containsKey(j.toString())) {
-          print('this function ran');
-          DatabaseReference ref = FirebaseDatabase.instance
-              .ref('2023/' + i.toString() + '/' + j.toString() + '/');
+          DatabaseReference ref =
+              FirebaseDatabase.instance.ref('SMR2023/' + j.toString() + '/');
           ref.set({
-            'pageData': variables.firebasePush[i.toString()][j.toString()]
-                ['pageData']
+            i.toString(): {
+              'pageData': variables.firebasePush[i.toString()][j.toString()]
+                  ['pageData']
+            }
           });
         }
       }
@@ -1801,47 +2552,6 @@ dynamic pushToFirebase() {
 //   "123/address/line1": "1 Mountain View",
 // });
 }
-
-dynamic signIntoAccount(emailAddress, password) async {
-  try {
-    final credential = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: emailAddress, password: password);
-    print(credential);
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'user-not-found') {
-      print('No user found for that email.');
-    } else if (e.code == 'wrong-password') {
-      print('Wrong password provided for that user.');
-    }
-  }
-}
-
-dynamic createAccount(emailAddress, password) async {
-  try {
-    final credential =
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: emailAddress.toString(),
-      password: password.toString(),
-    );
-    print(credential);
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'weak-password') {
-      print('The password provided is too weak.');
-    } else if (e.code == 'email-already-in-use') {
-      print('The account already exists for that email.');
-    }
-  } catch (e) {
-    print(e);
-  }
-}
-
-//AUTHENTICATION
-
-//HOW TO DO THIS BELOW https://firebase.google.com/docs/database/flutter/read-and-write
-
-// void getPageDataSP() async {
-//   SharedPreferences prefs = await SharedPreferences.getInstance();
-// }
 
 dynamic resetAllData() async {
   final prefs = await SharedPreferences.getInstance();
