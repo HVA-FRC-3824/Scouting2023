@@ -10,6 +10,11 @@ void setPageDataSP(matchNumber, robotNumber) async {
   );
 }
 
+void setSuperScoutSP(robotNumber) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setStringList(robotNumber.toString() + 'ssData', variables.ssData);
+}
+
 void setPitScoutSP(robotNumber) async {
   final prefs = await SharedPreferences.getInstance();
   prefs.setStringList(robotNumber.toString() + 'pitData', variables.pitData);
@@ -20,6 +25,18 @@ void setCodeToSP(secretCode) async {
   prefs.setString('Secret_Code', secretCode);
 }
 
+void setSSFB() async {
+  final prefs = await SharedPreferences.getInstance();
+  var bot = 0;
+  for (var j = bot; j < 9999; j++) {
+    if (prefs.containsKey(j.toString() + 'ssData')) {
+      print('This idea ran');
+      variables.firebaseSSPush[j.toString()] =
+          prefs.getStringList(j.toString() + 'ssData');
+    }
+  }
+}
+
 void setPitScoutFB() async {
   print('Pit Scout saved to sp initially');
   final prefs = await SharedPreferences.getInstance();
@@ -27,10 +44,8 @@ void setPitScoutFB() async {
   for (var j = bot; j < 9999; j++) {
     if (prefs.containsKey(j.toString() + 'pitData')) {
       print('This idea ran');
-      variables
-          .firebasePitPush[(prefs.getString('Secret_Code'))! + j.toString()] = {
-        prefs.getStringList(j.toString() + 'pitData')
-      };
+      variables.firebasePitPush[(prefs.getString('Secret_Code'))! +
+          j.toString()] = prefs.getStringList(j.toString() + 'pitData');
     }
   }
 }

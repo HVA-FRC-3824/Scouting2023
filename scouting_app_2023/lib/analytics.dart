@@ -11,16 +11,25 @@ import 'package:scouting_app_2023/shared_prefs.dart' as prefs;
 dynamic returnRobotJson(robotNumber) async {
   WidgetsFlutterBinding.ensureInitialized();
   DatabaseReference ref = FirebaseDatabase.instance.ref();
-  final snapshot = await ref.child('2023/').get();
-  var robotJson = {};
+  final snapshot = await ref.child('SMR2023/').get();
   var iterations = 0;
-  print(snapshot.value);
+  var robotJson = {
+    // 'startingPos'
+    // 'pointsAverage'
+    // 'chargingPoints'
+    //
+  };
+
+  print('snapshot is a ' + (snapshot.value.runtimeType).toString());
   if (snapshot.exists) {
     dynamic snap = snapshot.value;
-    for (var i = 0; i < snap.length; i++) {
-      if (snap[i] != null) {
-        if (snap[i]['118'] != null) {
-          var pageData = snap[i]['118']['pageData'];
+    if (snap[robotNumber.toString()] != null) {
+      print(snap['13']);
+      for (var i = 0; i < 60; i++) {
+        dynamic data = snap[robotNumber.toString()][i.toString()];
+        if (data != null) {
+          print('THE DATA READS' + data.toString());
+          var pageData = snap[robotNumber.toString()][i.toString()]['pageData'];
           var top = 0;
           var mid = 0;
           var bot = 0;
@@ -95,37 +104,58 @@ dynamic returnRobotJson(robotNumber) async {
           print(linkAmount);
           print(pageData[27]);
           print(pageData[31]);
-          if (robotJson['startingPos'] != null) {
-            robotJson['startingPos'] = ((robotJson['startingPos']!.toDouble() *
-                        iterations.toDouble()) +
-                    startingPos) /
-                (iterations.toDouble() + 1).toDouble();
-          } else {
-            robotJson['startingPos'] = startingPos;
+          if (robotJson['startingPos'] != null && startingPos != null) {
+            print(robotJson['startingPos']);
+            print(iterations);
+            print(startingPos);
+            print(pageData[27]);
+            robotJson['startingPos'] =
+                (((double.parse(robotJson['startingPos']) *
+                                iterations.toDouble()) +
+                            startingPos) /
+                        (iterations.toDouble() + 1).toDouble())
+                    .toString();
+          } else if (startingPos != null) {
+            robotJson['startingPos'] = startingPos.toString();
           }
           if (robotJson['pointsAverage'] != null) {
-            robotJson['pointsAverage'] = (((top * 5) + (mid * 3) + (bot * 2)) +
-                    (robotJson['pointsAverage'] * iterations)) /
-                (iterations + 1);
+            robotJson['pointsAverage'] = ((((top * 5) + (mid * 3) + (bot * 2)) +
+                        (double.parse(robotJson['pointsAverage']) *
+                            iterations)) /
+                    (iterations + 1))
+                .toString();
           } else {
-            robotJson['pointsAverage'] = (top * 5) + (mid * 3) + (bot * 2);
+            robotJson['pointsAverage'] =
+                ((top * 5) + (mid * 3) + (bot * 2)).toString();
           }
           if (charging != 404) {
             if (robotJson['chargingPoints'] != null) {
               robotJson['chargingPoints'] =
-                  ((robotJson['chargingPoints'] * iterations) + charging) /
-                      (iterations + 1);
+                  (((double.parse(robotJson['chargingPoints']) * iterations) +
+                              charging) /
+                          (iterations + 1))
+                      .toString();
             } else {
-              robotJson['chargingPoints'] = charging;
+              robotJson['chargingPoints'] = charging.toString();
             }
           }
           iterations = iterations + 1;
         }
       }
+      if (snap[robotNumber.toString()]['pitData'] != null) {
+        print(snap[robotNumber.toString()]['pitData'].runtimeType);
+        robotJson['driveTrain'] = snap[robotNumber.toString()]['pitData'][0];
+        robotJson['cargoTypes'] = snap[robotNumber.toString()]['pitData'][4];
+      }
+      if (snap[robotNumber.toString()]['superData'] != null) {
+        robotJson['mindset'] = snap[robotNumber.toString()]['superData'][1];
+        robotJson['gripper'] = snap[robotNumber.toString()]['superData'][0];
+        robotJson['ssnotes'] = snap[robotNumber.toString()]['superData'][2];
+      }
     }
   } else {
     print('No data available.');
   }
-  print('iterations' + iterations.toString());
-  print(robotJson);
+  print(robotJson.runtimeType);
+  return (robotJson);
 }

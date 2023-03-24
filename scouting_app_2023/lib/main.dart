@@ -40,12 +40,16 @@ void main() async {
         '/pitPrep': (context) => const PitPrep(),
 
         '/pit': (context) => const Pit(),
+
+        '/SScout': (context) => const SScout(),
+
+        '/analytics': (context) => const Analytics(),
       },
     ),
   );
 
   prefs.setFirebasePush();
-  //analytics.returnRobotJson(3824);
+  analytics.returnRobotJson(1313);
 //AUTHENTICATION
   WidgetsFlutterBinding.ensureInitialized();
   if (3 != 3) {
@@ -62,12 +66,7 @@ void main() async {
   } else {}
   // FirebaseAuth.instance.authStateChanges().listen((User? user) {
   //   if (user == null) {
-  //     print('User is currently signed out!');
-  //     authState = false;
-  //   } else {
-  //     authState = true;
-  //     print('User is signed in!');
-  //   }
+  //   } else {}
   // });
 //This when not commented out sets the persistent storage to variables.pageData
 //DO NOT UNDER ANY CIRCUMSTANCES LEAVE THIS COMMENTED INTO THE CODE
@@ -418,6 +417,12 @@ class FirstScreen extends StatefulWidget {
 
 bool settings = false;
 
+// dynamic signin() async {
+//   if (FirebaseAuth.instance.currentUser != null) {
+//     print(FirebaseAuth.instance.currentUser?.uid);
+//   }
+// }
+
 class FirstScreenState extends State<FirstScreen> {
   bool tempSettings = false;
   void refresh(rhaaSettings) async {
@@ -428,6 +433,12 @@ class FirstScreenState extends State<FirstScreen> {
     }
     setState(() {});
   }
+
+  // dynamic signin() async {
+  //   if (FirebaseAuth.instance.currentUser != null) {
+  //     print(FirebaseAuth.instance.currentUser?.uid);
+  //   }
+  // }
 
   dynamic tempState;
   @override
@@ -554,35 +565,16 @@ class FirstScreenState extends State<FirstScreen> {
           ),
           Container(
             width: MediaQuery.of(context).size.width,
-            height: (MediaQuery.of(context).size.height * .08),
-            color: const Color.fromARGB(255, 255, 0, 0),
+            height: (MediaQuery.of(context).size.height * .05),
+            color: Color.fromARGB(255, 187, 255, 241),
             child: TextButton(
               // Within the `FirstScreen` widget
               onPressed: () {
                 // Navigate to the second screen using a named route.
-                Navigator.pushNamed(context, '/pitPrep');
+                Navigator.pushNamed(context, '/SScout');
               },
               child: Text(
-                'Pit Scouting Page',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: (textSize / 80),
-                ),
-              ),
-            ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: (MediaQuery.of(context).size.height * .2),
-            color: const Color.fromARGB(255, 123, 123, 123),
-            child: TextButton(
-              // Within the `FirstScreen` widget
-              onPressed: () {
-                // Navigate to the second screen using a named route.
-                Navigator.pushNamed(context, '/prep');
-              },
-              child: Text(
-                'Scouting Page',
+                'Super Scouting',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: (textSize / 40),
@@ -592,7 +584,64 @@ class FirstScreenState extends State<FirstScreen> {
           ),
           Container(
             width: MediaQuery.of(context).size.width,
-            height: (MediaQuery.of(context).size.height * .2),
+            height: (MediaQuery.of(context).size.height * .1),
+            color: Color.fromARGB(255, 147, 41, 41),
+            child: TextButton(
+              // Within the `FirstScreen` widget
+              onPressed: () {
+                // Navigate to the second screen using a named route.
+                Navigator.pushNamed(context, '/pitPrep');
+              },
+              child: Text(
+                'Pit Scouting',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: (textSize / 40),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: (MediaQuery.of(context).size.height * .1),
+            color: const Color.fromARGB(255, 123, 123, 123),
+            child: TextButton(
+              // Within the `FirstScreen` widget
+              onPressed: () {
+                // Navigate to the second screen using a named route.
+                Navigator.pushNamed(context, '/prep');
+              },
+              child: Text(
+                'Scouting',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: (textSize / 40),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: (MediaQuery.of(context).size.height * .1),
+            color: const Color.fromARGB(255, 75, 156, 211),
+            child: TextButton(
+              // Within the `FirstScreen` widget
+              onPressed: () {
+                // Navigate to the second screen using a named route.
+                Navigator.pushNamed(context, '/analytics');
+              },
+              child: Text(
+                'Analytics',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: (textSize / 40),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: (MediaQuery.of(context).size.height * .1),
             color: const Color.fromARGB(255, 61, 61, 144),
             child: TextButton(
               // Within the `FirstScreen` widget
@@ -603,7 +652,7 @@ class FirstScreenState extends State<FirstScreen> {
                 );
               },
               child: Text(
-                'Schedule Page',
+                'Schedule',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: (textSize / 40),
@@ -1115,7 +1164,7 @@ class SecondScreenState extends State<SecondScreen> {
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           if (constraints.maxWidth > 600) {
-            return wideContainer();
+            return wideContainer(context);
           } else {
             return _buildNormalContainer();
           }
@@ -1131,7 +1180,7 @@ class SecondScreenState extends State<SecondScreen> {
     );
   }
 
-  Widget wideContainer() {
+  Widget wideContainer(context) {
     return Center(
         child: GridView.count(
       primary: false,
@@ -2471,13 +2520,486 @@ class PitState extends State<Pit> {
                   prefs.setPitScoutFB();
                   Future.delayed(const Duration(milliseconds: 500), () {
                     pitToFirebase();
-                    print('firebasePushFinished');
                   });
                 },
               ),
             ),
             Container(
               margin: const EdgeInsets.all(20),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SScout extends StatefulWidget {
+  const SScout({super.key});
+  @override
+  State<SScout> createState() => SScoutState();
+}
+
+const List<Widget> grip = <Widget>[
+  Text('0'),
+  Text('1'),
+  Text('2'),
+  Text('3'),
+  Text('4'),
+  Text('5'),
+  Text('6'),
+];
+
+const List<Widget> mindset = <Widget>[
+  Text('defense'),
+  Text('offense'),
+  Text('switch'),
+];
+
+class SScoutState extends State<SScout> {
+  void buttonPressed() async {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+    });
+  }
+
+  final List<bool> selectedGrip = <bool>[
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ];
+
+  final List<bool> botMindset = <bool>[
+    true,
+    false,
+    false,
+  ];
+  final numberController = TextEditingController();
+  final notesController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        title: const Text('Super Scouting'),
+        actions: [
+          Container(),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'Robot Number',
+              style: TextStyle(
+                fontSize: 25,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Container(
+              width: 100,
+              decoration: BoxDecoration(color: Colors.grey[200]),
+              child: TextField(
+                minLines: 1,
+                maxLines: 1,
+                controller: numberController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'ex.3824',
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'Grip Review',
+              style: TextStyle(
+                fontSize: 25,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            ToggleButtons(
+              onPressed: (int index) {
+                setState(() {
+                  // The button that is tapped is set to true, and the others to false.
+                  for (int i = 0; i < selectedGrip.length; i++) {
+                    selectedGrip[i] = i == index;
+                  }
+                });
+              },
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              selectedBorderColor: Colors.purple[700],
+              selectedColor: Colors.white,
+              fillColor: Colors.purple[200],
+              constraints: const BoxConstraints(
+                minHeight: 40.0,
+                minWidth: 30.0,
+              ),
+              isSelected: selectedGrip,
+              children: grip,
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Container(
+              child: Text(
+                'Bot Mindset',
+                style: TextStyle(
+                  fontSize: 25,
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            ToggleButtons(
+              onPressed: (int index) {
+                setState(() {
+                  // The button that is tapped is set to true, and the others to false.
+                  for (int i = 0; i < botMindset.length; i++) {
+                    botMindset[i] = i == index;
+                  }
+                });
+              },
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              selectedBorderColor: Colors.purple[700],
+              selectedColor: Colors.white,
+              fillColor: Colors.purple[200],
+              constraints: const BoxConstraints(
+                minHeight: 40.0,
+                minWidth: 70.0,
+              ),
+              isSelected: botMindset,
+              children: mindset,
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            const Text(
+              'Notes',
+              style: TextStyle(
+                fontSize: 25,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Container(
+              width: 300,
+              decoration: BoxDecoration(color: Colors.grey[200]),
+              child: TextField(
+                minLines: 1,
+                maxLines: 6,
+                controller: notesController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Notes',
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Container(
+              decoration:
+                  const BoxDecoration(color: Color.fromARGB(255, 75, 156, 211)),
+              child: TextButton(
+                child: const Text(
+                  'Done',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () {
+                  for (var i = 0; i < 7; i++) {
+                    if (selectedGrip[i] == true) {
+                      variables.ssData[0] = i.toString();
+                    }
+                  }
+                  if (botMindset[0] == true) {
+                    variables.ssData[1] = 'defense';
+                  } else if (botMindset[1] == true) {
+                    variables.ssData[1] = 'offense';
+                  } else {
+                    variables.ssData[1] = 'switch';
+                  }
+                  variables.ssData[2] = notesController.text;
+                  prefs.setSuperScoutSP(numberController.text);
+                  prefs.setSSFB();
+                  print(variables.firebaseSSPush);
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    ssToFirebase();
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Analytics extends StatefulWidget {
+  const Analytics({super.key});
+  @override
+  State<Analytics> createState() => AnalyticsState();
+}
+
+class AnalyticsState extends State<Analytics> {
+  void buttonPressed() async {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+    });
+  }
+
+  final numberController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * .10,
+        backgroundColor: const Color.fromARGB(255, 75, 156, 211),
+        title: const Text('Analytics'),
+        actions: [
+          Container(),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Robot Number',
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10),
+                ),
+                Container(
+                  width: 100,
+                  decoration: BoxDecoration(color: Colors.grey[200]),
+                  child: TextField(
+                    minLines: 1,
+                    maxLines: 1,
+                    controller: numberController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'ex.3824',
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10),
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 75, 156, 211)),
+                  child: TextButton(
+                    child: const Text(
+                      'Search',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: () async {
+                      variables.temprobotJson = await analytics
+                          .returnRobotJson(numberController.text);
+                      print(variables.temprobotJson);
+                      buttonPressed();
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Drive Train -',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                Container(
+                  width: 100,
+                  child: Text(
+                    variables.temprobotJson['driveTrain'].toString(),
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Average Cargo Pts -',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                Container(
+                  width: 100,
+                  child: Text(
+                    variables.temprobotJson['pointsAverage'].toString(),
+                    style: const TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Average Charge Pts -',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                Container(
+                  width: 100,
+                  child: Text(
+                    variables.temprobotJson['chargingPoints'].toString(),
+                    style: const TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Grip? -',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                Container(
+                  width: 100,
+                  child: Text(
+                    variables.temprobotJson['gripper'].toString(),
+                    style: const TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Offense/Defense -',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                Container(
+                  width: 100,
+                  child: Text(
+                    variables.temprobotJson['mindset'].toString(),
+                    style: const TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Cones/Cubes/Both -',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                ),
+                Container(
+                  width: 100,
+                  child: Text(
+                    variables.temprobotJson['cargoTypes'].toString(),
+                    style: const TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -2495,16 +3017,32 @@ dynamic pageDataIndexToMatchNum(matchNum) async {
 }
 
 dynamic pitToFirebase() {
-  print(variables.firebasePitPush);
+  print('firebasePitPush' + variables.firebasePitPush.runtimeType.toString());
   for (var j = 0; j < 9999; j++) {
-    try {
-      if (variables.firebasePitPush.containsKey('1492' + j.toString())) {
-        print('made it to here');
+    if (variables.firebasePitPush.containsKey('1492' + j.toString())) {
+      print('firebasePitPush' +
+          variables.firebasePitPush['1492' + j.toString()].runtimeType
+              .toString());
+      for (var i = 0;
+          i < variables.firebasePitPush['1492' + j.toString()].length;
+          i++) {
         DatabaseReference ref = FirebaseDatabase.instance
-            .ref('SMR2023/' + j.toString() + '/pitData/');
-        ref.set({variables.firebasePitPush['1492' + j.toString()]});
+            .ref('SMR2023/' + j.toString() + '/pitData/' + i.toString() + '/');
+        ref.set((variables.firebasePitPush['1492' + j.toString()][i]));
       }
-    } on Error {}
+    }
+  }
+}
+
+dynamic ssToFirebase() {
+  for (var j = 0; j < 9999; j++) {
+    if (variables.firebaseSSPush.containsKey(j.toString())) {
+      for (var i = 0; i < variables.firebaseSSPush[j.toString()].length; i++) {
+        DatabaseReference ref = FirebaseDatabase.instance.ref(
+            'SMR2023/' + j.toString() + '/superData/' + i.toString() + '/');
+        ref.set((variables.firebaseSSPush[j.toString()][i]));
+      }
+    }
   }
 }
 
@@ -2515,13 +3053,11 @@ dynamic pushToFirebase() {
     if (variables.firebasePush.containsKey(i.toString())) {
       for (var j = jndex; j < 9999; j++) {
         if (variables.firebasePush[i.toString()].containsKey(j.toString())) {
-          DatabaseReference ref =
-              FirebaseDatabase.instance.ref('SMR2023/' + j.toString() + '/');
+          DatabaseReference ref = FirebaseDatabase.instance
+              .ref('SMR2023/' + j.toString() + '/' + i.toString() + '/');
           ref.set({
-            i.toString(): {
-              'pageData': variables.firebasePush[i.toString()][j.toString()]
-                  ['pageData']
-            }
+            'pageData': variables.firebasePush[i.toString()][j.toString()]
+                ['pageData']
           });
         }
       }

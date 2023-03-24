@@ -94,6 +94,18 @@ var firebasePush = {};
 
 var firebasePitPush = {};
 
+var firebaseSSPush = {};
+
+dynamic temprobotJson = {
+  'startingPos': 'null',
+  'pointsAverage': 'null',
+  'chargingPoints': 'null',
+  'driveTrain': 'null',
+  'cargoTypes': 'null',
+  'gripper': 'null',
+  'ssnotes': 'null',
+};
+
 List<String> pageData = [
   '0', //[0]
   '0', //[1]
@@ -144,6 +156,12 @@ List<String> pitData = [
   'How high?', //5
   'AutoBalance Auto?', //6
   'Team Friendliness', //7
+];
+
+List<String> ssData = [
+  'Grip Strength',
+  'Approach',
+  'Scouter Notes',
 ];
 
 var testVar = false;
